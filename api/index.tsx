@@ -402,8 +402,8 @@ app.frame('/show/:fid', async (c) => {
                 </Text>
               </Box>
               <Spacer size="22" />
-              {displayData.map((follower, index) => (
-              <Box flexDirection="row" key={index} alignHorizontal="center" alignVertical="center">
+              {displayData.map((follower) => (
+              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
                 <Box 
                   borderStyle="solid" 
                   borderRadius="42"
