@@ -131,12 +131,144 @@ app.castAction(
 
     // Parse the message back to an object to extract fid
     const parsedCastId = JSON.parse(castId);
-    const toFid = parsedCastId.fid;
+    const castFid = parsedCastId.fid;
 
-    return c.frame({ path: `/gift/${toFid}`})
+    return c.frame({ path: `/fc-storage-gift-frame/${castFid}`})
   }, 
   { name: "Storage Gift", icon: "database", description: "A Cast Action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
 )
+
+
+app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
+  const { castFid } = c.req.param();
+
+  try {
+    const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${castFid}`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'api_key': process.env.NEYNAR_API_KEY || '',
+      },
+    });
+
+    const data = await response.json();
+    const userData = data.users[0];
+
+    return c.res({
+      action: `/tx-status`,
+      image: (
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
+        >
+          <VStack gap="4">
+              <Box flexDirection="row">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/arb.png"
+                  />
+                <Spacer size="10" />
+                <Text color="tosca" decoration="underline" align="center" size="14">
+                  Arbitrum One
+                </Text>
+              </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+                <Box 
+                  borderStyle="solid" 
+                  borderRadius="42"
+                  borderWidth="4" 
+                  borderColor="blue" 
+                  height="64" 
+                  width="64" 
+                >
+                  <Image
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
+                  />
+                </Box>
+                <Spacer size="12" />
+                  <Box flexDirection="column" alignHorizontal="left">
+                    <Text color="white" align="left" size="14">
+                      {userData.display_name}
+                    </Text>
+                    <Text color="grey" align="left" size="12">
+                      @{userData.username}
+                    </Text>
+                  </Box>
+                </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                <Text color="white" align="center" size="16">Do you want to gift</Text>
+                <Spacer size="10" />
+                <Text color="blue" align="center" size="16">@{userData.username}</Text>
+                <Spacer size="10" />
+                <Text color="white" align="center" size="16">?</Text>
+              </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="10" />
+                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+              </Box>
+          </VStack>
+      </Box>
+      ),
+      intents: [
+        <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
+      ]
+    })
+    } catch (error) {
+      return c.res({
+        image: (
+          <Box
+              grow
+              alignVertical="center"
+              backgroundColor="black"
+              padding="48"
+              textAlign="center"
+              height="100%"
+          >
+              <VStack gap="4">
+                  <Box flexDirection="row">
+                    <Image
+                        height="24"
+                        objectFit="cover"
+                        src="/images/arb.png"
+                      />
+                    <Spacer size="10" />
+                    <Text color="tosca" decoration="underline" align="center" size="14">
+                      Arbitrum One
+                    </Text>
+                  </Box>
+                  <Spacer size="16" />
+                  <Heading color="white" weight="900" align="center" size="32">
+                    ⚠️ Failed ⚠️
+                  </Heading>
+                  <Spacer size="22" />
+                  <Text align="center" color="grey" size="16">
+                     Uh oh, something went wrong!
+                  </Text>
+                  <Spacer size="22" />
+                  <Box flexDirection="row" justifyContent="center">
+                      <Text color="white" align="center" size="14">created by</Text>
+                      <Spacer size="10" />
+                      <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  </Box>
+              </VStack>
+          </Box>
+        ),
+    });
+    }
+})
 
 
 app.frame('/dashboard', async (c) => {
@@ -515,7 +647,7 @@ app.frame('/gift/:toFid', async (c) => {
   const { toFid } = c.req.param();
 
   try {
-    const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}&viewer_fid=${toFid}`, {
+    const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
