@@ -737,7 +737,7 @@ app.frame("/tx-status", async (c) => {
                 Status
               </Heading>
               <Spacer size="22" />
-              <Text align="center" color="blue" size="14">
+              <Text align="center" color="blue" size="16">
                 Storage gifted successfully!
               </Text>
               <Spacer size="22" />
