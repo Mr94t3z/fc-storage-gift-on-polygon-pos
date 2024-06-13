@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -178,13 +178,13 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  <Image
+                  {/* <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={userData.pfp_url}
-                  />
+                  /> */}
                 </Box>
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
@@ -504,7 +504,7 @@ app.frame('/show/:fid', async (c) => {
 
     const username = displayData.length > 0 ? displayData[0].username : null;
 
-    const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
+    // const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
 
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
@@ -904,7 +904,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
