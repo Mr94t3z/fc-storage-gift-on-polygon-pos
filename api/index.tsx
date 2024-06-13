@@ -112,12 +112,29 @@ app.frame('/', (c) => {
     ),
     intents: [
       <Button action='/dashboard'>Start</Button>,
-      <Button.AddCastAction action='/builder-score'>
+      <Button.AddCastAction action='/fc-storage-gift'>
         Install Action
       </Button.AddCastAction>,
     ]
   })
 })
+
+
+app.castAction(
+  '/fc-storage-gift',
+  (c) => {
+    // Stringify the entire castId object
+    const castId = JSON.stringify(c.actionData.castId);
+
+    // Parse the message back to an object to extract fid
+    const parsedCastId = JSON.parse(castId);
+    const toFid = parsedCastId.fid;
+
+    return c.frame({ path: `/gift/${toFid}`})
+  }, 
+  { name: "Storage Gift", icon: "gift", description: "A Cast Action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
+)
+
 
 app.frame('/dashboard', async (c) => {
   const { fid } = c.var.interactor || {}
@@ -571,8 +588,8 @@ app.frame('/gift/:toFid', async (c) => {
       </Box>
       ),
       intents: [
-        <Button.Transaction target={`/tx-gift/${toFid}`}>Yes</Button.Transaction>,
-        <Button.Reset>No</Button.Reset>,
+        <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
+        <Button.Reset>Cancel</Button.Reset>,
       ]
     })
     } catch (error) {
