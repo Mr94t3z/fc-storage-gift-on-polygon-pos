@@ -81,7 +81,7 @@ app.frame('/', (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
@@ -164,7 +164,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
@@ -236,7 +236,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                         src="/images/arb.png"
                       />
                     <Spacer size="10" />
-                    <Text color="tosca" decoration="underline" align="center" size="14">
+                    <Text color="grey" decoration="underline" align="center" size="14">
                       Arbitrum One
                     </Text>
                   </Box>
@@ -295,7 +295,7 @@ app.frame('/dashboard', async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
@@ -364,7 +364,7 @@ app.frame('/dashboard', async (c) => {
                       src="/images/arb.png"
                     />
                   <Spacer size="10" />
-                  <Text color="tosca" decoration="underline" align="center" size="14">
+                  <Text color="grey" decoration="underline" align="center" size="14">
                     Arbitrum One
                   </Text>
                 </Box>
@@ -526,7 +526,7 @@ app.frame('/show/:fid', async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
@@ -605,7 +605,7 @@ app.frame('/show/:fid', async (c) => {
                       src="/images/arb.png"
                     />
                   <Spacer size="10" />
-                  <Text color="tosca" decoration="underline" align="center" size="14">
+                  <Text color="grey" decoration="underline" align="center" size="14">
                     Arbitrum One
                   </Text>
                 </Box>
@@ -668,7 +668,7 @@ app.frame('/gift/:toFid', async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
@@ -741,7 +741,7 @@ app.frame('/gift/:toFid', async (c) => {
                         src="/images/arb.png"
                       />
                     <Spacer size="10" />
-                    <Text color="tosca" decoration="underline" align="center" size="14">
+                    <Text color="grey" decoration="underline" align="center" size="14">
                       Arbitrum One
                     </Text>
                   </Box>
@@ -858,7 +858,7 @@ app.frame("/tx-status", async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
+                <Text color="grey" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
