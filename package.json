@@ -11,7 +11,7 @@
     "@neynar/nodejs-sdk": "^1.15.0",
     "@paywithglide/glide-js": "^0.6.2",
     "dotenv": "^16.4.5",
-    "frog": "^0.11.3",
+    "frog": "^0.11.7",
     "hono": "^4",
     "viem": "^2.9.31"
   },
