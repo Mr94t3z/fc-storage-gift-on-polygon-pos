@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -45,14 +45,16 @@ export const app = new Frog({
   basePath: '/api/frame',
   ui: { vars },
   browserLocation: CAST_INTENS,
+  headers: { "Cache-Control": "max-age=3200" },
   imageOptions: {
     /* Other default options */
     fonts: [
       {
-        name: 'Space Mono',
+        name: "JetBrains Mono",
         source: 'google',
       },
-    ],    
+    ],
+    format: "png",
   },
 }).use(
   neynar({
@@ -913,7 +915,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
