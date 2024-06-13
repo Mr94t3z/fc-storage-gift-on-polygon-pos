@@ -46,8 +46,11 @@ export const app = new Frog({
   ui: { vars },
   browserLocation: CAST_INTENS,
   headers: { "Cache-Control": "max-age=3200" },
+  imageAspectRatio: '1.91:1',
   imageOptions: {
     /* Other default options */
+    height: 600,
+    width: 600,
     fonts: [
       {
         name: "JetBrains Mono",
@@ -82,7 +85,7 @@ app.frame('/', (c) => {
           backgroundColor="black"
           padding="48"
           textAlign="center"
-          height="100%"
+          height="48"
         >
           <VStack gap="4">
               <Box flexDirection="row">
@@ -165,7 +168,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
           backgroundColor="black"
           padding="48"
           textAlign="center"
-          height="100%"
+          height="48"
         >
           <VStack gap="4">
               <Box flexDirection="row">
