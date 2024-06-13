@@ -31,7 +31,7 @@ export const glideClient = createGlideClient({
   projectId: process.env.GLIDE_PROJECT_ID,
  
   // Lists the chains where payments will be accepted
-  chains: [Chains.Base, Chains.Optimism],
+  chains: [Chains.Arbitrum, Chains.Optimism],
 });
 
 const CAST_INTENS = 
@@ -78,7 +78,7 @@ app.frame('/', (c) => {
           padding="48"
           textAlign="center"
           height="100%"
-      >
+        >
           <VStack gap="4">
               <Box flexDirection="row">
                 <Image
@@ -87,17 +87,19 @@ app.frame('/', (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="grey" decoration="underline" align="center" size="14">
+                <Text color="tosca" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
               <Spacer size="16" />
               <Heading color="white" weight="900" align="center" size="32">
-                Farcaster Storage Gift
+                Farcaster Storage Gift 
               </Heading>
               <Spacer size="22" />
-              <Text align="center" color="grey" size="16">
-                A Frame & Cast action to gift storage to a user you follow, or by clicking the action using Arbitrum One.
+              <Text align="center" color="grey" size="14">
+                Gift storage to the users you follow who are low on storage!
+              </Text> <Text align="center" color="grey" size="14">
+                Powered by Arbitrum.
               </Text>
               <Spacer size="22" />
               <Box flexDirection="row" justifyContent="center">
@@ -141,7 +143,7 @@ app.frame('/dashboard', async (c) => {
           padding="48"
           textAlign="center"
           height="100%"
-      >
+        >
           <VStack gap="4">
               <Box flexDirection="row">
                 <Image
@@ -150,16 +152,40 @@ app.frame('/dashboard', async (c) => {
                     src="/images/arb.png"
                   />
                 <Spacer size="10" />
-                <Text color="grey" decoration="underline" align="center" size="14">
+                <Text color="tosca" decoration="underline" align="center" size="14">
                   Arbitrum One
                 </Text>
               </Box>
-              <Spacer size="16" />
-              <Heading color="white" weight="900" align="center" size="32">
-                Farcaster Storage Gift
-              </Heading>
               <Spacer size="22" />
-              <Text align="center" color="grey" size="16">
+              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+                <Box 
+                  borderStyle="solid" 
+                  borderRadius="42"
+                  borderWidth="4" 
+                  borderColor="blue" 
+                  height="64" 
+                  width="64" 
+                >
+                  <Image
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
+                  />
+                </Box>
+                <Spacer size="12" />
+                  <Box flexDirection="column" alignHorizontal="left">
+                    <Text color="white" align="left" size="14">
+                      Hi, {userData.display_name} 👋
+                    </Text>
+                    <Text color="grey" align="left" size="12">
+                      @{userData.username}
+                    </Text>
+                  </Box>
+                </Box>
+              <Spacer size="22" />
+              <Text align="center" color="blue" size="16">
                 Do you want to find them?
               </Text>
               <Spacer size="22" />
@@ -195,7 +221,7 @@ app.frame('/dashboard', async (c) => {
                       src="/images/arb.png"
                     />
                   <Spacer size="10" />
-                  <Text color="grey" decoration="underline" align="center" size="14">
+                  <Text color="tosca" decoration="underline" align="center" size="14">
                     Arbitrum One
                   </Text>
                 </Box>
@@ -205,7 +231,7 @@ app.frame('/dashboard', async (c) => {
                 </Heading>
                 <Spacer size="22" />
                 <Text align="center" color="grey" size="16">
-                   Uh oh, you need to sign up first!
+                   Uh oh, something went wrong!
                 </Text>
                 <Spacer size="22" />
                 <Box flexDirection="row" justifyContent="center">
@@ -259,9 +285,10 @@ app.frame('/show/:fid', async (c) => {
 
     // Iterate over each chunk and make separate requests for storage data
     for (const chunk of chunkedUsers) {
-        const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; username: any; pfp_url: any; }; }) => {
-            if (userData && userData.user && userData.user.fid !== undefined && userData.user.username && userData.user.pfp_url) {
+         const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; display_name: any; username: any; pfp_url: any; }; }) => {
+            if (userData && userData.user && userData.user.fid !== undefined &&  userData.user.display_name && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
+                const display_name = userData.user.display_name;
                 const username = userData.user.username;
                 const pfp_url = userData.user.pfp_url;
 
@@ -292,6 +319,7 @@ app.frame('/show/:fid', async (c) => {
 
                     return {
                         fid: followingFid,
+                        display_name: display_name,
                         username: username,
                         pfp_url: pfp_url,
                         totalStorageLeft: totalStorageLeft,
@@ -333,104 +361,134 @@ app.frame('/show/:fid', async (c) => {
 
     return c.res({
       image: (
-        <div style={{
-            alignItems: 'center',
-            background: '#11365D',
-            backgroundSize: '100% 100%',
-            display: 'flex',
-            flexDirection: 'column',
-            flexWrap: 'nowrap',
-            height: '100%',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            color: 'white',
-            fontFamily: 'Space Mono',
-            fontSize: 32,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 0,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
-           {displayData.map((follower, index) => (
-            <div key={index} style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'white', display: 'flex', fontSize: 30, flexDirection: 'column', marginBottom: 20 }}>
-              <img
-                  src={follower.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : follower.pfp_url}
-                  style={{
-                      width: 180,
-                      height: 180,
-                      borderRadius: '50%',
-                      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
-                      border: '5px solid #FD274A',
-                  }}
-                  width={200}
-                  height={200}
-                  alt="Profile Picture"
-              />
-              <p style={{ marginTop: 30, marginBottom: 15, color: "orange", justifyContent: 'center', textAlign: 'center', fontSize: 42, textDecoration: 'underline' }}>@{follower.username}</p>
-              <p>
-              </p>
-              {follower.totalStorageLeft <= 0 ? (
-                <p style={{ margin: 0, color: '#FD274A' }}>💾 Out of storage!</p>
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
+        >
+          <VStack gap="4">
+              <Box flexDirection="row">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/arb.png"
+                  />
+                <Spacer size="10" />
+                <Text color="tosca" decoration="underline" align="center" size="14">
+                  Arbitrum One
+                </Text>
+              </Box>
+              <Spacer size="22" />
+              {displayData.map((follower, index) => (
+              <Box flexDirection="row" key={index} alignHorizontal="center" alignVertical="center">
+                <Box 
+                  borderStyle="solid" 
+                  borderRadius="42"
+                  borderWidth="4" 
+                  borderColor="blue" 
+                  height="64" 
+                  width="64" 
+                >
+                  <Image
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={follower.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : follower.pfp_url}
+                  />
+                </Box>
+                <Spacer size="12" />
+                  <Box flexDirection="column" alignHorizontal="left">
+                    <Text color="white" align="left" size="14">
+                      {follower.display_name}
+                    </Text>
+                    <Text color="grey" align="left" size="12">
+                      @{follower.username}
+                    </Text>
+                  </Box>
+                </Box>
+              ))}
+              <Spacer size="22" />
+              {totalStorageLeft <= 0 ? (
+                <Text align="center" color="red" size="16">
+                  💾 Out of storage!
+                </Text>
               ) : (
-                <p style={{ margin: 0 }}>
-                  <span style={{ color: 'white' }}>💾 Storage Left: </span>
-                  <span style={{ color: '#FD274A' }}>{follower.totalStorageLeft}</span>
-                </p>
+                <Box flexDirection="row" justifyContent="center">
+                <Text color="blue" align="center" size="16">💾 {totalStorageLeft}</Text>
+                <Spacer size="10" />
+                <Text color="white" align="center" size="16">storage left!</Text>
+              </Box>
               )}
-            </div>
-          ))}
-        </div>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="10" />
+                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+              </Box>
+          </VStack>
+      </Box>
       ),
       intents: [
-          <Button action={`/gift/${toFid}/${totalStorageLeft}`}>View ◉</Button>,
-          <Button.Reset>Cancel ⏏︎</Button.Reset>,
+          <Button action={`/gift/${toFid}`}>Gift</Button>,
+          <Button.Reset>Cancel</Button.Reset>,
          currentPage > 1 && <Button value="back">← Back</Button>,
         currentPage < totalPages && <Button value="next">Next →</Button>,
       ],
     });
   } catch (error) {
-    console.error('Error fetching user data:', error);
     return c.res({
       image: (
-          <div
-              style={{
-                  alignItems: 'center',
-                  background: '#11365D',
-                  backgroundSize: '100% 100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexWrap: 'nowrap',
-                  height: '100%',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  width: '100%',
-                  color: '#FD274A',
-                  fontFamily: 'Space Mono',
-                  fontSize: 32,
-                  fontStyle: 'normal',
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.4,
-                  marginTop: 0,
-                  padding: '0 120px',
-                  whiteSpace: 'pre-wrap',
-              }}
-          >
-            Uh oh, you clicked the button too fast! Please try again.
-          </div>
+        <Box
+            grow
+            alignVertical="center"
+            backgroundColor="black"
+            padding="48"
+            textAlign="center"
+            height="100%"
+        >
+            <VStack gap="4">
+                <Box flexDirection="row">
+                  <Image
+                      height="24"
+                      objectFit="cover"
+                      src="/images/arb.png"
+                    />
+                  <Spacer size="10" />
+                  <Text color="tosca" decoration="underline" align="center" size="14">
+                    Arbitrum One
+                  </Text>
+                </Box>
+                <Spacer size="16" />
+                <Heading color="white" weight="900" align="center" size="32">
+                  ⚠️ Failed ⚠️
+                </Heading>
+                <Spacer size="22" />
+                <Text align="center" color="grey" size="16">
+                   Uh oh, something went wrong!
+                </Text>
+                <Spacer size="22" />
+                <Box flexDirection="row" justifyContent="center">
+                    <Text color="white" align="center" size="14">created by</Text>
+                    <Spacer size="10" />
+                    <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                </Box>
+            </VStack>
+        </Box>
       ),
       intents: [
-          <Button.Reset>Try Again ⏏︎</Button.Reset>,
-      ],
-  });
+        <Button action='/dashboard'>Try again</Button>,
+      ]
+    });
   }
 });
 
 
-app.frame('/gift/:toFid/:totalStorageLeft', async (c) => {
-  const { toFid, totalStorageLeft } = c.req.param();
+app.frame('/gift/:toFid', async (c) => {
+  const { toFid } = c.req.param();
 
   try {
     const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}&viewer_fid=${toFid}`, {
@@ -447,94 +505,119 @@ app.frame('/gift/:toFid/:totalStorageLeft', async (c) => {
     return c.res({
       action: `/tx-status`,
       image: (
-        <div
-            style={{
-              alignItems: 'center',
-              background: '#11365D',
-              backgroundSize: '100% 100%',
-              display: 'flex',
-              flexDirection: 'column',
-              flexWrap: 'nowrap',
-              height: '100%',
-              justifyContent: 'center',
-              textAlign: 'center',
-              width: '100%',
-              color: 'black',
-              fontFamily: 'Space Mono',
-              fontSize: 32,
-              fontStyle: 'normal',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.4,
-              marginTop: 0,
-              padding: '0 120px',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            <img
-              src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
-              style={{
-                width: 180,
-                height: 180,
-                borderRadius: '50%',
-                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
-                border: '5px solid #FD274A',
-              }}
-            />
-
-            <p style={{ marginTop: 50, fontSize: 42 }}>
-              <span style={{ color: 'white' }}>Gift storage to </span>
-              <span style={{ color: 'orange', textDecoration: 'underline' }}>@{userData.username}</span>
-              <span style={{ color: 'white' }}> ?</span>
-            </p>
-
-            {Number(totalStorageLeft) <= 0 ? (
-              <p style={{ marginTop: 30, color: '#FD274A'}}>💾 Out of storage!</p>
-            ) : (
-              <p style={{marginTop: 30 }}>
-                <span style={{ color: 'white' }}>💾 Storage Left: </span>
-                <span style={{ color: '#FD274A' }}>{totalStorageLeft}</span>
-              </p>
-            )}
-          </div>
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
+        >
+          <VStack gap="4">
+              <Box flexDirection="row">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/arb.png"
+                  />
+                <Spacer size="10" />
+                <Text color="tosca" decoration="underline" align="center" size="14">
+                  Arbitrum One
+                </Text>
+              </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+                <Box 
+                  borderStyle="solid" 
+                  borderRadius="42"
+                  borderWidth="4" 
+                  borderColor="blue" 
+                  height="64" 
+                  width="64" 
+                >
+                  <Image
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
+                  />
+                </Box>
+                <Spacer size="12" />
+                  <Box flexDirection="column" alignHorizontal="left">
+                    <Text color="white" align="left" size="14">
+                      {userData.display_name}
+                    </Text>
+                    <Text color="grey" align="left" size="12">
+                      @{userData.username}
+                    </Text>
+                  </Box>
+                </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                <Text color="white" align="center" size="16">Do you want to gift</Text>
+                <Spacer size="10" />
+                <Text color="blue" align="center" size="16">@{userData.username}</Text>
+                <Spacer size="10" />
+                <Text color="white" align="center" size="16">?</Text>
+              </Box>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="10" />
+                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+              </Box>
+          </VStack>
+      </Box>
       ),
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Yes</Button.Transaction>,
-         <Button.Reset>No</Button.Reset>,
+        <Button.Reset>No</Button.Reset>,
       ]
     })
     } catch (error) {
-      console.error('Error fetching user data:', error);
       return c.res({
         image: (
-            <div
-                style={{
-                    alignItems: 'center',
-                    background: '#11365D',
-                    backgroundSize: '100% 100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexWrap: 'nowrap',
-                    height: '100%',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    width: '100%',
-                    color: '#FD274A',
-                    fontFamily: 'Space Mono',
-                    fontSize: 32,
-                    fontStyle: 'normal',
-                    letterSpacing: '-0.025em',
-                    lineHeight: 1.4,
-                    marginTop: 0,
-                    padding: '0 120px',
-                    whiteSpace: 'pre-wrap',
-                }}
-            >
-              Uh oh, you clicked the button too fast! Please try again.
-            </div>
+          <Box
+              grow
+              alignVertical="center"
+              backgroundColor="black"
+              padding="48"
+              textAlign="center"
+              height="100%"
+          >
+              <VStack gap="4">
+                  <Box flexDirection="row">
+                    <Image
+                        height="24"
+                        objectFit="cover"
+                        src="/images/arb.png"
+                      />
+                    <Spacer size="10" />
+                    <Text color="tosca" decoration="underline" align="center" size="14">
+                      Arbitrum One
+                    </Text>
+                  </Box>
+                  <Spacer size="16" />
+                  <Heading color="white" weight="900" align="center" size="32">
+                    ⚠️ Failed ⚠️
+                  </Heading>
+                  <Spacer size="22" />
+                  <Text align="center" color="grey" size="16">
+                     Uh oh, something went wrong!
+                  </Text>
+                  <Spacer size="22" />
+                  <Box flexDirection="row" justifyContent="center">
+                      <Text color="white" align="center" size="14">created by</Text>
+                      <Spacer size="10" />
+                      <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  </Box>
+              </VStack>
+          </Box>
         ),
         intents: [
-            <Button.Reset>Try Again ⏏︎</Button.Reset>,
-        ],
+          <Button action='/dashboard'>Try again</Button>,
+        ]
     });
     }
 })
@@ -564,7 +647,7 @@ async (c) => {
    
     // Optional. Setting this restricts the user to only
     // pay with the specified currency.
-    paymentCurrency: CurrenciesByChain.BaseMainnet.ETH,
+    paymentCurrency: CurrenciesByChain.ArbitrumMainnet.ETH,
     
     transaction: {
       chainId: Chains.Optimism.caip2,
@@ -583,7 +666,7 @@ async (c) => {
   }
 
   return c.send({
-    chainId: Chains.Base.caip2,
+    chainId: Chains.Arbitrum.caip2,
     to: unsignedTransaction.to,
     data: unsignedTransaction.input,
     value: hexToBigInt(unsignedTransaction.value),
@@ -612,31 +695,42 @@ app.frame("/tx-status", async (c) => {
  
     return c.res({
       image: (
-        <div
-          style={{
-            alignItems: 'center',
-            background: '#11365D',
-            backgroundSize: '100% 100%',
-            display: 'flex',
-            flexDirection: 'column',
-            flexWrap: 'nowrap',
-            height: '100%',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            color: 'white',
-            fontFamily: 'Space Mono',
-            fontSize: 32,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 0,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
         >
-          Storage gifted successfully!
-        </div>
+          <VStack gap="4">
+              <Box flexDirection="row">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/arb.png"
+                  />
+                <Spacer size="10" />
+                <Text color="tosca" decoration="underline" align="center" size="14">
+                  Arbitrum One
+                </Text>
+              </Box>
+              <Spacer size="16" />
+              <Heading color="white" weight="900" align="center" size="32">
+                Status
+              </Heading>
+              <Spacer size="22" />
+              <Text align="center" color="blue" size="14">
+                Storage gifted successfully!
+              </Text>
+              <Spacer size="22" />
+              <Box flexDirection="row" justifyContent="center">
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="10" />
+                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+              </Box>
+          </VStack>
+      </Box>
       ),
       intents: [
         <Button.Link
@@ -644,41 +738,14 @@ app.frame("/tx-status", async (c) => {
         >
           View on Exploler
         </Button.Link>,
-        <Button action="/">Home ⏏︎</Button>,
+        <Button action="/">Home</Button>,
       ],
     });
   } catch (e) {
     // If the session is not found, it means the payment is still pending.
     // Let the user know that the payment is pending and show a button to refresh the status.
     return c.res({
-      image: (
-        <div
-          style={{
-            alignItems: 'center',
-            background: '#11365D',
-            backgroundSize: '100% 100%',
-            display: 'flex',
-            flexDirection: 'column',
-            flexWrap: 'nowrap',
-            height: '100%',
-            justifyContent: 'center',
-            textAlign: 'center',
-            width: '100%',
-            color: '#FD274A',
-            fontFamily: 'Space Mono',
-            fontSize: 32,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 0,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          Waiting for payment confirmation..
-        </div>
-      ),
- 
+      image: '/waiting.gif',
       intents: [
         <Button value={txHash} action="/tx-status">
           Refresh
