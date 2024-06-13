@@ -35,7 +35,7 @@ export const glideClient = createGlideClient({
 });
 
 const CAST_INTENS = 
-  "https://warpcast.com/~/compose?text=Storage%20Farcaster%20Gift%20by%20@0x94t3z.eth&embeds[]=https://storage-farcaster-gift.vercel.app/api/frame"
+  "https://warpcast.com/~/compose?text=FC%20Storage%20Gift%20%F0%9F%8E%AF%0AFrame%20by%20@0x94t3z.eth&embeds[]=https://storage-farcaster-gift.vercel.app/api/frame"
 
 export const app = new Frog({
   assetsPath: '/',

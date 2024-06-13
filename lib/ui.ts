@@ -4,15 +4,10 @@ export const { Box, Columns, Column, Image, Heading, Text, VStack, Spacer, vars 
   colors: {
     white: "white",
     black: "rgb(32,49,71)",
-    fcPurple: "rgb(71,42,145)",
     red: "rgb(253,39,74)",
     tosca: "rgb(157,204,237)",
-    yellow: 'rgb(247,169,72)',
-    purple: 'rgb(117,89,236)',
     blue: 'rgb(18,169,255)',
     grey: 'rgba(128, 128, 128, 0.75)',
-    metalPink : 'rgb(195,141,147)',
-    bg : 'rgb(23,24,26)'
   },
   fonts: {
     default: [
