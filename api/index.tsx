@@ -135,7 +135,7 @@ app.castAction(
 
     return c.frame({ path: `/fc-storage-gift-frame/${castFid}`})
   }, 
-  { name: "Storage Gift", icon: "database", description: "A Cast Action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
+  { name: "Storage Gift", icon: "database", description: "a cast action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
 )
 
 
@@ -223,7 +223,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
       </Box>
       ),
       intents: [
-        <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
+        <Button.Transaction target={`/tx-gift/${castFid}`}>Confirm</Button.Transaction>,
       ]
     })
     } catch (error) {
