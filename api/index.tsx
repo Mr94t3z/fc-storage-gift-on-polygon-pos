@@ -803,7 +803,7 @@ async (c) => {
    
     // Optional. Setting this restricts the user to only
     // pay with the specified currency.
-    paymentCurrency: CurrenciesByChain.ArbitrumMainnet.ETH,
+    paymentCurrency: CurrenciesByChain.ArbitrumOneMainnet.ETH,
     
     transaction: {
       chainId: Chains.Optimism.caip2,
