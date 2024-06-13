@@ -45,20 +45,7 @@ export const app = new Frog({
   basePath: '/api/frame',
   ui: { vars },
   browserLocation: CAST_INTENS,
-  headers: { "Cache-Control": "max-age=3200" },
   imageAspectRatio: '1.91:1',
-  imageOptions: {
-    /* Other default options */
-    height: 600,
-    width: 600,
-    fonts: [
-      {
-        name: "JetBrains Mono",
-        source: 'google',
-      },
-    ],
-    format: "png",
-  },
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY || '',
@@ -76,7 +63,6 @@ const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
 
 // Initial frame
 app.frame('/', (c) => {
-  currentPage = 1;
   return c.res({
     image: (
       <Box
@@ -192,13 +178,13 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  {/* <Image
+                  <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
-                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
-                  /> */}
+                    src={userData.pfp_url}
+                  />
                 </Box>
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
@@ -328,7 +314,7 @@ app.frame('/dashboard', async (c) => {
                     height="56"
                     width="56"
                     objectFit="cover"
-                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
+                    src={userData.pfp_url}
                   />
                 </Box>
                 <Spacer size="12" />
@@ -340,7 +326,7 @@ app.frame('/dashboard', async (c) => {
                       @{userData.username}
                     </Text>
                   </Box>
-                </Box>
+              </Box>
               <Spacer size="22" />
               <Text align="center" color="blue" size="16">
                 Do you want to find them?
