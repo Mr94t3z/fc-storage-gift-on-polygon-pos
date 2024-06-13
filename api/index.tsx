@@ -309,13 +309,13 @@ app.frame('/dashboard', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  <Image
+                  {/* <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={userData.pfp_url}
-                  />
+                  /> */}
                 </Box>
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
@@ -545,7 +545,7 @@ app.frame('/show/:fid', async (c) => {
                     height="56"
                     width="56"
                     objectFit="cover"
-                    src={pfpUrl.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : pfpUrl}
+                    src='images/no_avatar.png'
                   />
                 </Box>
                 <Spacer size="12" />
@@ -687,7 +687,7 @@ app.frame('/gift/:toFid', async (c) => {
                     height="56"
                     width="56"
                     objectFit="cover"
-                    src={userData.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : userData.pfp_url}
+                    src={userData.pfp_url}
                   />
                 </Box>
                 <Spacer size="12" />

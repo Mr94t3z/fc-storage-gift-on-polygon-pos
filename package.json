@@ -12,13 +12,13 @@
     "@paywithglide/glide-js": "^0.6.2",
     "dotenv": "^16.4.5",
     "esbuild": "^0.21.5",
-    "frog": "^0.11.3",
+    "frog": "0.11.7",
     "hono": "^4",
     "viem": "^2.13.10"
   },
   "devDependencies": {
     "tsx": "^4.15.4",
     "typescript": "^5.4.5",
-    "vercel": "^32.3.0"
+    "vercel": "^34.2.7"
   }
 }
