@@ -135,7 +135,7 @@ app.castAction(
 
     return c.frame({ path: `/gift/${toFid}`})
   }, 
-  { name: "Storage Gift", icon: "gift", description: "A Cast Action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
+  { name: "Storage Gift", icon: "database", description: "A Cast Action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
 )
 
 
@@ -377,6 +377,12 @@ app.frame('/show/:fid', async (c) => {
     // Get the follower chosen to gift storage
     const toFid = displayData.length > 0 ? displayData[0].fid : null;
 
+    const displayName = displayData.length > 0 ? displayData[0].display_name : null;
+
+    const username = displayData.length > 0 ? displayData[0].username : null;
+
+    const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
+
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
     return c.res({
@@ -402,7 +408,6 @@ app.frame('/show/:fid', async (c) => {
                 </Text>
               </Box>
               <Spacer size="22" />
-              {displayData.map((follower) => (
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
                 <Box 
                   borderStyle="solid" 
@@ -417,20 +422,19 @@ app.frame('/show/:fid', async (c) => {
                     height="56"
                     width="56"
                     objectFit="cover"
-                    src={follower.pfp_url.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : follower.pfp_url}
+                    src={pfpUrl.toLowerCase().endsWith('.webp') ? '/images/no_avatar.png' : pfpUrl}
                   />
                 </Box>
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
-                      {follower.display_name}
+                      {displayName}
                     </Text>
                     <Text color="grey" align="left" size="12">
-                      @{follower.username}
+                      @{username}
                     </Text>
                   </Box>
                 </Box>
-              ))}
               <Spacer size="22" />
               {totalStorageLeft <= 0 ? (
                 <Text align="center" color="red" size="16">
@@ -592,7 +596,7 @@ app.frame('/gift/:toFid', async (c) => {
       ),
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
-        <Button.Reset>Cancel</Button.Reset>,
+        <Button action='/'>Cancel</Button>,
       ]
     })
     } catch (error) {
