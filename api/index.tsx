@@ -180,11 +180,13 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   width="64" 
                 >
                   <img
-                    borderRadius="38"
-                    height="56"
-                    width="56"
-                    objectFit="cover"
                     src={userData.pfp_url}
+                    width="128"
+                    height="128"
+                    style={{
+                      borderRadius: "0%",
+                      border: "3.5px solid #B1FC5A",
+                    }}
                   />
                   {/* <Image
                     borderRadius="38"
