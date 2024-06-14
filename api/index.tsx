@@ -180,7 +180,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   width="64" 
                 >
                   <Image
-                    borderRadius="38"
+                    borderRadius="0"
                     height="56"
                     width="56"
                     objectFit="cover"
@@ -194,7 +194,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
-                      borderRadius: "38%",
+                      borderRadius: "0%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
@@ -323,7 +323,7 @@ app.frame('/dashboard', async (c) => {
                   width="64" 
                 >
                   <Image
-                    borderRadius="38"
+                    borderRadius="0"
                     height="56"
                     width="56"
                     objectFit="cover"
@@ -337,7 +337,7 @@ app.frame('/dashboard', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
-                      borderRadius: "38%",
+                      borderRadius: "0%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
@@ -566,7 +566,7 @@ app.frame('/show/:fid', async (c) => {
                   width="64" 
                 >
                   <Image
-                    borderRadius="38"
+                    borderRadius="0"
                     height="56"
                     width="56"
                     objectFit="cover"
@@ -580,7 +580,7 @@ app.frame('/show/:fid', async (c) => {
                     objectFit="cover"
                     src={pfpUrl}
                     style={{
-                      borderRadius: "38%",
+                      borderRadius: "0%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
@@ -720,7 +720,7 @@ app.frame('/gift/:toFid', async (c) => {
                   width="64" 
                 >
                   <Image
-                    borderRadius="38"
+                    borderRadius="0"
                     height="56"
                     width="56"
                     objectFit="cover"
@@ -734,7 +734,7 @@ app.frame('/gift/:toFid', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
-                      borderRadius: "38%",
+                      borderRadius: "0%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
