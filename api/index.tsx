@@ -64,6 +64,7 @@ const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
 // Initial frame
 app.frame('/', (c) => {
   return c.res({
+    title: 'Farcaster Storage Gift',
     image: (
       <Box
           grow
@@ -178,6 +179,13 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
+                  <img
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={userData.pfp_url}
+                  />
                   {/* <Image
                     borderRadius="38"
                     height="56"
