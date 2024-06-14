@@ -44,7 +44,6 @@ export const app = new Frog({
   assetsPath: '/',
   basePath: '/api/frame',
   ui: { vars },
-  headers: { "Cache-Control": "max-age=3200" },
   browserLocation: CAST_INTENS,
 }).use(
   neynar({
