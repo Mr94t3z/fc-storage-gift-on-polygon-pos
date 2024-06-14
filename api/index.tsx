@@ -309,22 +309,27 @@ app.frame('/dashboard', async (c) => {
                   borderColor="blue" 
                   height="64" 
                   width="64" 
-                > */}
-                  {/* <Image
-                    borderRadius="38"
-                    height="56"
-                    width="56"
-                    objectFit="cover"
-                    src={userData.pfp_url}
-                  /> */}
-                {/* </Box> */}
-                <img
+                >
+                  <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={userData.pfp_url}
                   />
+                </Box> */}
+
+                <img
+                    height="128"
+                    width="128"
+                    objectFit="cover"
+                    src={userData.pfp_url}
+                    style={{
+                      borderRadius: "38%",
+                      border: "3.5px solid #12A9FF",
+                    }}
+                  />
+                
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
