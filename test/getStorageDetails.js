@@ -8,7 +8,7 @@ const main = async () => {
     const apiKey = process.env.AIRSTACK_API_KEY;
   
     try {
-      const response = await fetch(`${server}/v1/storageLimitsByFid?fid=16098`, {
+      const response = await fetch(`${server}/v1/storageLimitsByFid?fid=602617`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
