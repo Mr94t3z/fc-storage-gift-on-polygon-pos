@@ -44,7 +44,6 @@ export const app = new Frog({
   assetsPath: '/',
   basePath: '/api/frame',
   ui: { vars },
-  headers: { "Cache-Control": "max-age=0" },
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
 }).use(
@@ -190,8 +189,8 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                 </Box> */}
 
                 <img
-                    height="128"
-                    width="128"
+                    height="96"
+                    width="96"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
@@ -333,8 +332,8 @@ app.frame('/dashboard', async (c) => {
                 </Box> */}
 
                 <img
-                    height="128"
-                    width="128"
+                    height="96"
+                    width="96"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
@@ -576,8 +575,8 @@ app.frame('/show/:fid', async (c) => {
                 </Box> */}
                 
                 <img
-                    height="128"
-                    width="128"
+                    height="96"
+                    width="96"
                     objectFit="cover"
                     src={pfpUrl}
                     style={{
@@ -730,8 +729,8 @@ app.frame('/gift/:toFid', async (c) => {
                 </Box> */}
 
                 <img
-                    height="128"
-                    width="128"
+                    height="96"
+                    width="96"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
