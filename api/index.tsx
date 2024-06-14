@@ -411,7 +411,7 @@ app.frame('/dashboard', async (c) => {
         </Box>
       ),
       intents: [
-        <Button.Reset>Try again</Button.Reset>,
+        <Button action='/dashboard'>Try again</Button>,
       ]
     });
   }
@@ -664,7 +664,7 @@ app.frame('/show/:fid', async (c) => {
         </Box>
       ),
       intents: [
-        <Button.Reset>Try again</Button.Reset>,
+        <Button action='/dashboard'>Try again</Button>,
       ]
     });
   }
@@ -768,7 +768,7 @@ app.frame('/gift/:toFid', async (c) => {
       ),
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
-        <Button.Reset>Cancel</Button.Reset>,
+        <Button action='/'>Cancel</Button>,
       ]
     })
     } catch (error) {
@@ -812,7 +812,7 @@ app.frame('/gift/:toFid', async (c) => {
           </Box>
         ),
         intents: [
-          <Button.Reset>Try again</Button.Reset>,
+          <Button action='/dashboard'>Try again</Button>,
         ]
     });
     }
@@ -934,7 +934,7 @@ app.frame("/tx-status", async (c) => {
         >
           View on Exploler
         </Button.Link>,
-        <Button.Reset>Home</Button.Reset>,
+        <Button action="/">Home</Button>,
       ],
     });
   } catch (e) {
