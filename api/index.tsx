@@ -413,7 +413,7 @@ app.frame('/dashboard', async (c) => {
         </Box>
       ),
       intents: [
-        <Button action='/dashboard'>Try again</Button>,
+        <Button.Reset>Try again</Button.Reset>,
       ]
     });
   }
@@ -667,7 +667,7 @@ app.frame('/show/:fid', async (c) => {
         </Box>
       ),
       intents: [
-        <Button action='/dashboard'>Try again</Button>,
+        <Button.Reset>Try again</Button.Reset>,
       ]
     });
   }
@@ -816,7 +816,7 @@ app.frame('/gift/:toFid', async (c) => {
           </Box>
         ),
         intents: [
-          <Button action='/dashboard'>Try again</Button>,
+          <Button.Reset>Try again</Button.Reset>,
         ]
     });
     }
@@ -938,7 +938,7 @@ app.frame("/tx-status", async (c) => {
         >
           View on Exploler
         </Button.Link>,
-        <Button action="/">Home</Button>,
+        <Button.Reset>Home</Button.Reset>,
       ],
     });
   } catch (e) {
