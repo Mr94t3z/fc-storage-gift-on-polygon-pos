@@ -529,6 +529,8 @@ app.frame('/show/:fid', async (c) => {
 
     const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
 
+    const imageUrl = pfpUrl && pfpUrl.length > 40 ? '/no_avatar.png' : pfpUrl;
+
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
     return c.res({
@@ -575,7 +577,7 @@ app.frame('/show/:fid', async (c) => {
                 <img
                     height="128"
                     width="128"
-                    src={pfpUrl}
+                    src={imageUrl}
                     style={{
                       borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
