@@ -179,15 +179,6 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  <img
-                    src={userData.pfp_url}
-                    width="128"
-                    height="128"
-                    style={{
-                      borderRadius: "0%",
-                      border: "3.5px solid #B1FC5A",
-                    }}
-                  />
                   {/* <Image
                     borderRadius="38"
                     height="56"
@@ -311,14 +302,14 @@ app.frame('/dashboard', async (c) => {
               </Box>
               <Spacer size="22" />
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                <Box 
+                {/* <Box 
                   borderStyle="solid" 
                   borderRadius="42"
                   borderWidth="4" 
                   borderColor="blue" 
                   height="64" 
                   width="64" 
-                >
+                > */}
                   {/* <Image
                     borderRadius="38"
                     height="56"
@@ -326,7 +317,14 @@ app.frame('/dashboard', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                   /> */}
-                </Box>
+                {/* </Box> */}
+                <img
+                    borderRadius="38"
+                    height="56"
+                    width="56"
+                    objectFit="cover"
+                    src={userData.pfp_url}
+                  />
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
