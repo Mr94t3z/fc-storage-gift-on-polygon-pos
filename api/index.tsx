@@ -189,8 +189,8 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                 </Box> */}
 
                 <img
-                    height="96"
-                    width="96"
+                    height="128"
+                    width="128"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
@@ -332,8 +332,8 @@ app.frame('/dashboard', async (c) => {
                 </Box> */}
 
                 <img
-                    height="96"
-                    width="96"
+                    height="128"
+                    width="128"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
@@ -575,8 +575,8 @@ app.frame('/show/:fid', async (c) => {
                 </Box> */}
                 
                 <img
-                    height="96"
-                    width="96"
+                    height="128"
+                    width="128"
                     objectFit="cover"
                     src={pfpUrl}
                     style={{
@@ -729,8 +729,8 @@ app.frame('/gift/:toFid', async (c) => {
                 </Box> */}
 
                 <img
-                    height="96"
-                    width="96"
+                    height="128"
+                    width="128"
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
