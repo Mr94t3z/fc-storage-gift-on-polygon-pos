@@ -325,7 +325,7 @@ app.frame('/dashboard', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
-                      borderRadius: "38%",
+                      borderRadius: "50%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
