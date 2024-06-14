@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -533,7 +533,7 @@ app.frame('/show/:fid', async (c) => {
 
     const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
 
-    // const imageUrl = pfpUrl && pfpUrl.length > 50 ? '/no_avatar.png' : pfpUrl;
+    const imageUrl = pfpUrl && pfpUrl.length > 50 ? '/no_avatar.png' : pfpUrl;
 
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
@@ -581,7 +581,7 @@ app.frame('/show/:fid', async (c) => {
                 <img
                     height="96"
                     width="96"
-                    src={pfpUrl}
+                    src={imageUrl}
                     style={{
                       borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
@@ -957,7 +957,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
