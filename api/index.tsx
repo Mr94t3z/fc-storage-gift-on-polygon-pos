@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -140,83 +140,6 @@ app.frame('/fc-storage-gift-frame/:toFid', async (c) => {
     return c.res({
       action: `/tx-status`,
       image: `/gift-image/${toFid}`,
-      // image: (
-      //   <Box
-      //     grow
-      //     alignVertical="center"
-      //     backgroundColor="black"
-      //     padding="48"
-      //     textAlign="center"
-      //     height="48"
-      //   >
-      //     <VStack gap="4">
-      //         <Box flexDirection="row">
-      //           <Image
-      //               height="24"
-      //               objectFit="cover"
-      //               src="/images/arb.png"
-      //             />
-      //           <Spacer size="10" />
-      //           <Text color="tosca" decoration="underline" align="center" size="14">
-      //             Arbitrum One
-      //           </Text>
-      //         </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-      //           {/* <Box 
-      //             borderStyle="solid" 
-      //             borderRadius="42"
-      //             borderWidth="4" 
-      //             borderColor="blue" 
-      //             height="64" 
-      //             width="64" 
-      //           >
-      //             <Image
-      //               borderRadius="38"
-      //               height="56"
-      //               width="56"
-      //               objectFit="cover"
-      //               src={userData.pfp_url}
-      //             />
-      //           </Box> */}
-
-      //           <img
-      //               height="128"
-      //               width="128"
-      //               src={imageUrl}
-      //               style={{
-      //                 borderRadius: "38%",
-      //                 border: "3.5px solid #12A9FF",
-      //               }}
-      //             />
-
-      //           <Spacer size="12" />
-      //             <Box flexDirection="column" alignHorizontal="left">
-      //               <Text color="white" align="left" size="14">
-      //                 {userData.display_name}
-      //               </Text>
-      //               <Text color="grey" align="left" size="12">
-      //                 @{userData.username}
-      //               </Text>
-      //             </Box>
-      //           </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" justifyContent="center">
-      //           <Text color="white" align="center" size="16">Do you want to gift</Text>
-      //           <Spacer size="10" />
-      //           <Text color="blue" align="center" size="16">@{userData.username}</Text>
-      //           <Spacer size="10" />
-      //           <Text color="white" align="center" size="16">?</Text>
-      //         </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" justifyContent="center">
-      //             <Text color="white" align="center" size="14">created by</Text>
-      //             <Spacer size="10" />
-      //             <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-      //         </Box>
-      //     </VStack>
-      // </Box>
-      // ),
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
       ]
@@ -270,93 +193,9 @@ app.frame('/dashboard', async (c) => {
   const { fid } = c.var.interactor || {}
 
   try {
-    const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${fid}`, {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'api_key': process.env.NEYNAR_API_KEY || '',
-      },
-    });
-
-    const data = await response.json();
-    const userData = data.users[0];
-
-    const imageUrl = userData.pfp_url.length > 50 ? '/no_avatar.png' : userData.pfp_url;
 
     return c.res({
-      image: (
-        <Box
-          grow
-          alignVertical="center"
-          backgroundColor="black"
-          padding="48"
-          textAlign="center"
-          height="100%"
-        >
-          <VStack gap="4">
-              <Box flexDirection="row">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src="/images/arb.png"
-                  />
-                <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
-                  Arbitrum One
-                </Text>
-              </Box>
-              <Spacer size="22" />
-              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                {/* <Box 
-                  borderStyle="solid" 
-                  borderRadius="42"
-                  borderWidth="4" 
-                  borderColor="blue" 
-                  height="64" 
-                  width="64" 
-                >
-                  <Image
-                    borderRadius="38"
-                    height="56"
-                    width="56"
-                    objectFit="cover"
-                    src={userData.pfp_url}
-                  />
-                </Box> */}
-
-                <img
-                    height="128"
-                    width="128"
-                    src={imageUrl}
-                    style={{
-                      borderRadius: "38%",
-                      border: "3.5px solid #12A9FF",
-                    }}
-                  />
-                
-                <Spacer size="12" />
-                  <Box flexDirection="column" alignHorizontal="left">
-                    <Text color="white" align="left" size="14">
-                      Hi, {userData.display_name} 👋
-                    </Text>
-                    <Text color="grey" align="left" size="12">
-                      @{userData.username}
-                    </Text>
-                  </Box>
-              </Box>
-              <Spacer size="22" />
-              <Text align="center" color="blue" size="16">
-                Do you want to find them?
-              </Text>
-              <Spacer size="22" />
-              <Box flexDirection="row" justifyContent="center">
-                  <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="10" />
-                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-              </Box>
-          </VStack>
-      </Box>
-      ),
+      image: `/dashboard-image/${fid}`,
       intents: [
         <Button action={`/show/${fid}`}>Yes, please!</Button>,
         <Button.Reset>No</Button.Reset>
@@ -410,6 +249,103 @@ app.frame('/dashboard', async (c) => {
 });
 
 
+app.image('/dashboard-image/:fid', async (c) => {
+  const { fid } = c.req.param();
+
+  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${fid}`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'api_key': process.env.NEYNAR_API_KEY || '',
+    },
+  });
+
+  const data = await response.json();
+  const userData = data.users[0];
+
+  return c.res({
+    imageOptions: {
+      headers: {
+        'Cache-Control': 'max-age=0',
+      },
+    },
+    image: (
+      <Box
+        grow
+        alignVertical="center"
+        backgroundColor="black"
+        padding="48"
+        textAlign="center"
+        height="100%"
+      >
+        <VStack gap="4">
+            <Box flexDirection="row">
+              <Image
+                  height="24"
+                  objectFit="cover"
+                  src={logo}
+                />
+              <Spacer size="10" />
+              <Text color="tosca" decoration="underline" align="center" size="14">
+                Arbitrum One
+              </Text>
+            </Box>
+            <Spacer size="22" />
+            <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+              {/* <Box 
+                borderStyle="solid" 
+                borderRadius="42"
+                borderWidth="4" 
+                borderColor="blue" 
+                height="64" 
+                width="64" 
+              >
+                <Image
+                  borderRadius="38"
+                  height="56"
+                  width="56"
+                  objectFit="cover"
+                  src={userData.pfp_url}
+                />
+              </Box> */}
+
+              <img
+                  height="128"
+                  width="128"
+                  src={userData.pfp_url}
+                  style={{
+                    borderRadius: "38%",
+                    border: "3.5px solid #12A9FF",
+                  }}
+                />
+              
+              <Spacer size="12" />
+                <Box flexDirection="column" alignHorizontal="left">
+                  <Text color="white" align="left" size="14">
+                    Hi, {userData.display_name} 👋
+                  </Text>
+                  <Text color="grey" align="left" size="12">
+                    @{userData.username}
+                  </Text>
+                </Box>
+            </Box>
+            <Spacer size="22" />
+            <Text align="center" color="blue" size="16">
+              Do you want to find them?
+            </Text>
+            <Spacer size="22" />
+            <Box flexDirection="row" justifyContent="center">
+                <Text color="white" align="center" size="14">created by</Text>
+                <Spacer size="10" />
+                <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+            </Box>
+        </VStack>
+    </Box>
+    ),
+  })
+})
+
+
 app.frame('/show/:fid', async (c) => {
   const { fid } = c.req.param();
 
@@ -453,9 +389,6 @@ app.frame('/show/:fid', async (c) => {
          const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; display_name: any; username: any; pfp_url: any; }; }) => {
             if (userData && userData.user && userData.user.fid !== undefined &&  userData.user.display_name && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
-                // const display_name = userData.user.display_name;
-                // const username = userData.user.username;
-                // const pfp_url = userData.user.pfp_url;
 
                 // Check if storage data is already cached
                 let storageData = await getFromCache(followingFid);
@@ -484,9 +417,6 @@ app.frame('/show/:fid', async (c) => {
 
                     return {
                         fid: followingFid,
-                        // display_name: display_name,
-                        // username: username,
-                        // pfp_url: pfp_url,
                         totalStorageLeft: totalStorageLeft,
                     };
                 }
@@ -522,99 +452,11 @@ app.frame('/show/:fid', async (c) => {
     // Get the follower chosen to gift storage
     const toFid = displayData.length > 0 ? displayData[0].fid : null;
 
-    // const displayName = displayData.length > 0 ? displayData[0].display_name : null;
-
-    // const username = displayData.length > 0 ? displayData[0].username : null;
-
-    // const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
-
-    // const imageUrl = pfpUrl && pfpUrl.length > 50 ? '/no_avatar.png' : pfpUrl;
-
+    // Get the total storage left of the follower chosen to gift storage
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
     return c.res({
       image: `/show-image/${toFid}/${totalStorageLeft}`,
-      // image: (
-      //   <Box
-      //     grow
-      //     alignVertical="center"
-      //     backgroundColor="black"
-      //     padding="48"
-      //     textAlign="center"
-      //     height="100%"
-      //   >
-      //     <VStack gap="4">
-      //         <Box flexDirection="row">
-      //           <Image
-      //               height="24"
-      //               objectFit="cover"
-      //               src="/images/arb.png"
-      //             />
-      //           <Spacer size="10" />
-      //           <Text color="tosca" decoration="underline" align="center" size="14">
-      //             Arbitrum One
-      //           </Text>
-      //         </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-      //           {/* <Box 
-      //             borderStyle="solid" 
-      //             borderRadius="42"
-      //             borderWidth="4" 
-      //             borderColor="blue" 
-      //             height="64" 
-      //             width="64" 
-      //           >
-      //             <Image
-      //               borderRadius="38"
-      //               height="56"
-      //               width="56"
-      //               objectFit="cover"
-      //               src={pfpUrl}
-      //             />
-      //           </Box> */}
-                
-      //           <img
-      //               height="96"
-      //               width="96"
-      //               src={imageUrl}
-      //               style={{
-      //                 borderRadius: "38%",
-      //                 border: "3.5px solid #12A9FF",
-      //               }}
-      //             />
-
-      //           <Spacer size="12" />
-      //             <Box flexDirection="column" alignHorizontal="left">
-      //               <Text color="white" align="left" size="14">
-      //                 {displayName}
-      //               </Text>
-      //               <Text color="grey" align="left" size="12">
-      //                 @{username}
-      //               </Text>
-      //             </Box>
-      //           </Box>
-      //         <Spacer size="22" />
-      //         {totalStorageLeft <= 0 ? (
-      //           <Text align="center" color="red" size="16">
-      //             💾 Out of storage!
-      //           </Text>
-      //         ) : (
-      //           <Box flexDirection="row" justifyContent="center">
-      //           <Text color="blue" align="center" size="16">💾 {totalStorageLeft}</Text>
-      //           <Spacer size="10" />
-      //           <Text color="white" align="center" size="16">storage left!</Text>
-      //         </Box>
-      //         )}
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" justifyContent="center">
-      //             <Text color="white" align="center" size="14">created by</Text>
-      //             <Spacer size="10" />
-      //             <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-      //         </Box>
-      //     </VStack>
-      // </Box>
-      // ),
       intents: [
           <Button action={`/gift/${toFid}`}>Gift</Button>,
           <Button.Reset>Cancel</Button.Reset>,
@@ -767,83 +609,6 @@ app.frame('/gift/:toFid', async (c) => {
     return c.res({
       action: `/tx-status`,
       image: `/gift-image/${toFid}`,
-      // image: (
-      //   <Box
-      //     grow
-      //     alignVertical="center"
-      //     backgroundColor="black"
-      //     padding="48"
-      //     textAlign="center"
-      //     height="100%"
-      //   >
-      //     <VStack gap="4">
-      //         <Box flexDirection="row">
-      //           <Image
-      //               height="24"
-      //               objectFit="cover"
-      //               src="/images/arb.png"
-      //             />
-      //           <Spacer size="10" />
-      //           <Text color="tosca" decoration="underline" align="center" size="14">
-      //             Arbitrum One
-      //           </Text>
-      //         </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-      //           {/* <Box 
-      //             borderStyle="solid" 
-      //             borderRadius="42"
-      //             borderWidth="4" 
-      //             borderColor="blue" 
-      //             height="64" 
-      //             width="64" 
-      //           >
-      //             <Image
-      //               borderRadius="38"
-      //               height="56"
-      //               width="56"
-      //               objectFit="cover"
-      //               src={userData.pfp_url}
-      //             />
-      //           </Box> */}
-
-      //           <img
-      //               height="128"
-      //               width="128"
-      //               src={imageUrl}
-      //               style={{
-      //                 borderRadius: "38%",
-      //                 border: "3.5px solid #12A9FF",
-      //               }}
-      //             />
-                
-      //           <Spacer size="12" />
-      //             <Box flexDirection="column" alignHorizontal="left">
-      //               <Text color="white" align="left" size="14">
-      //                 {userData.display_name}
-      //               </Text>
-      //               <Text color="grey" align="left" size="12">
-      //                 @{userData.username}
-      //               </Text>
-      //             </Box>
-      //           </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" justifyContent="center">
-      //           <Text color="white" align="center" size="16">Do you want to gift</Text>
-      //           <Spacer size="10" />
-      //           <Text color="blue" align="center" size="16">@{userData.username}</Text>
-      //           <Spacer size="10" />
-      //           <Text color="white" align="center" size="16">?</Text>
-      //         </Box>
-      //         <Spacer size="22" />
-      //         <Box flexDirection="row" justifyContent="center">
-      //             <Text color="white" align="center" size="14">created by</Text>
-      //             <Spacer size="10" />
-      //             <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-      //         </Box>
-      //     </VStack>
-      // </Box>
-      // ),
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
         <Button action='/'>Cancel</Button>,
@@ -1116,7 +881,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
