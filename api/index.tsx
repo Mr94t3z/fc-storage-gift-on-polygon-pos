@@ -171,7 +171,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
               </Box>
               <Spacer size="22" />
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                <Box 
+                {/* <Box 
                   borderStyle="solid" 
                   borderRadius="42"
                   borderWidth="4" 
@@ -179,14 +179,26 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  {/* <Image
+                  <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={userData.pfp_url}
-                  /> */}
-                </Box>
+                  />
+                </Box> */}
+
+                <img
+                    height="128"
+                    width="128"
+                    objectFit="cover"
+                    src={userData.pfp_url}
+                    style={{
+                      borderRadius: "38%",
+                      border: "3.5px solid #12A9FF",
+                    }}
+                  />
+
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
@@ -325,7 +337,7 @@ app.frame('/dashboard', async (c) => {
                     objectFit="cover"
                     src={userData.pfp_url}
                     style={{
-                      borderRadius: "50%",
+                      borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
                     }}
                   />
@@ -517,7 +529,7 @@ app.frame('/show/:fid', async (c) => {
 
     const username = displayData.length > 0 ? displayData[0].username : null;
 
-    // const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
+    const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
 
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
@@ -545,7 +557,7 @@ app.frame('/show/:fid', async (c) => {
               </Box>
               <Spacer size="22" />
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                <Box 
+                {/* <Box 
                   borderStyle="solid" 
                   borderRadius="42"
                   borderWidth="4" 
@@ -553,14 +565,26 @@ app.frame('/show/:fid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  {/* <Image
+                  <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={pfpUrl}
-                  /> */}
-                </Box>
+                  />
+                </Box> */}
+                
+                <img
+                    height="128"
+                    width="128"
+                    objectFit="cover"
+                    src={pfpUrl}
+                    style={{
+                      borderRadius: "38%",
+                      border: "3.5px solid #12A9FF",
+                    }}
+                  />
+
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
@@ -687,7 +711,7 @@ app.frame('/gift/:toFid', async (c) => {
               </Box>
               <Spacer size="22" />
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                <Box 
+                {/* <Box 
                   borderStyle="solid" 
                   borderRadius="42"
                   borderWidth="4" 
@@ -695,14 +719,26 @@ app.frame('/gift/:toFid', async (c) => {
                   height="64" 
                   width="64" 
                 >
-                  {/* <Image
+                  <Image
                     borderRadius="38"
                     height="56"
                     width="56"
                     objectFit="cover"
                     src={userData.pfp_url}
-                  /> */}
-                </Box>
+                  />
+                </Box> */}
+
+                <img
+                    height="128"
+                    width="128"
+                    objectFit="cover"
+                    src={userData.pfp_url}
+                    style={{
+                      borderRadius: "38%",
+                      border: "3.5px solid #12A9FF",
+                    }}
+                  />
+                
                 <Spacer size="12" />
                   <Box flexDirection="column" alignHorizontal="left">
                     <Text color="white" align="left" size="14">
