@@ -44,7 +44,7 @@ export const app = new Frog({
   assetsPath: '/',
   basePath: '/api/frame',
   ui: { vars },
-  headers: { "Cache-Control": "max-age=3200" },
+  headers: { "Cache-Control": "max-age=0" },
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
 }).use(
