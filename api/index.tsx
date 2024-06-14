@@ -434,10 +434,15 @@ app.frame('/show/:fid', async (c) => {
     const followingData = await followingResponse.json();
 
     // Batch processing
-    const chunkSize = 15;
     const chunkedUsers = [];
-    for (let i = 0; i < followingData.users.length; i += chunkSize) {
-        chunkedUsers.push(followingData.users.slice(i, i + chunkSize));
+    if (Array.isArray(followingData.users)) {
+        const chunkSize = 15;
+        for (let i = 0; i < followingData.users.length; i += chunkSize) {
+            chunkedUsers.push(followingData.users.slice(i, i + chunkSize));
+        }
+    } else {
+        console.error('followingData.users is not an array or is undefined');
+        // Handle or throw an error as appropriate
     }
 
     // Array to store promises for storage requests
