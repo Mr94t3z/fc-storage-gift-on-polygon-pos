@@ -146,6 +146,8 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
     const data = await response.json();
     const userData = data.users[0];
 
+    const imageUrl = userData.pfp_url.length > 50 ? '/no_avatar.png' : userData.pfp_url;
+
     return c.res({
       action: `/tx-status`,
       image: (
@@ -191,7 +193,7 @@ app.frame('/fc-storage-gift-frame/:castFid', async (c) => {
                 <img
                     height="128"
                     width="128"
-                    src={userData.pfp_url}
+                    src={imageUrl}
                     style={{
                       borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
@@ -289,6 +291,8 @@ app.frame('/dashboard', async (c) => {
     const data = await response.json();
     const userData = data.users[0];
 
+    const imageUrl = userData.pfp_url.length > 50 ? '/no_avatar.png' : userData.pfp_url;
+
     return c.res({
       image: (
         <Box
@@ -333,7 +337,7 @@ app.frame('/dashboard', async (c) => {
                 <img
                     height="128"
                     width="128"
-                    src={userData.pfp_url}
+                    src={imageUrl}
                     style={{
                       borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
@@ -685,6 +689,8 @@ app.frame('/gift/:toFid', async (c) => {
     const data = await response.json();
     const userData = data.users[0];
 
+    const imageUrl = userData.pfp_url.length > 50 ? '/no_avatar.png' : userData.pfp_url;
+
     return c.res({
       action: `/tx-status`,
       image: (
@@ -730,7 +736,7 @@ app.frame('/gift/:toFid', async (c) => {
                 <img
                     height="128"
                     width="128"
-                    src={userData.pfp_url}
+                    src={imageUrl}
                     style={{
                       borderRadius: "38%",
                       border: "3.5px solid #12A9FF",
