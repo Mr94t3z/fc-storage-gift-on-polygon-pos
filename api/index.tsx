@@ -579,8 +579,8 @@ app.frame('/show/:fid', async (c) => {
                 </Box> */}
                 
                 <img
-                    height="128"
-                    width="128"
+                    height="96"
+                    width="96"
                     src={imageUrl}
                     style={{
                       borderRadius: "38%",
