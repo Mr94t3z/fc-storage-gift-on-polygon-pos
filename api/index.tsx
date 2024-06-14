@@ -529,7 +529,7 @@ app.frame('/show/:fid', async (c) => {
 
     const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
 
-    const imageUrl = pfpUrl && pfpUrl.length > 40 ? '/no_avatar.png' : pfpUrl;
+    const imageUrl = pfpUrl && pfpUrl.length > 50 ? '/no_avatar.png' : pfpUrl;
 
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
