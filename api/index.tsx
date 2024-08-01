@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -258,16 +258,6 @@ app.frame('/show/:fid', async (c) => {
 
     const followingData = await followingResponse.json();
 
-    // Log followingData for debugging
-    console.log('Following data:', followingData);
-
-    // Ensure followingData.users is defined and is an array
-    if (!followingData.users || !Array.isArray(followingData.users)) {
-      return c.error({
-        message: 'Invalid following data received',
-      })
-    }
-
     // Batch processing
     const chunkSize = 15;
     const chunkedUsers = [];
@@ -297,8 +287,6 @@ app.frame('/show/:fid', async (c) => {
                         },
                     });
                     storageData = await storageResponse.json();
-
-                    console.log(`Storage data for ${username}:`, storageData);
 
                     // Cache the storage data
                     await cacheData(followingFid, storageData);
@@ -352,10 +340,74 @@ app.frame('/show/:fid', async (c) => {
     // Get the follower chosen to gift storage
     const toFid = displayData.length > 0 ? displayData[0].fid : null;
 
+    const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
+
+    const displayName = displayData.length > 0 ? displayData[0].display_name : null;
+
+    const username = displayData.length > 0 ? displayData[0].username : null;
+
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
     return c.res({
-      image: `/show-image/${toFid}/${totalStorageLeft}`,
+        image: (
+          <Box
+            grow
+            alignVertical="center"
+            backgroundColor="black"
+            padding="48"
+            textAlign="center"
+            height="100%"
+          >
+            <VStack gap="4">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/polygon.png"
+                  />
+                <Spacer size="32" />
+                <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+                  
+                  <img
+                      height="96"
+                      width="96"
+                      src={pfpUrl}
+                      style={{
+                        borderRadius: "38%",
+                        border: "3.5px solid #6212EC",
+                      }}
+                    />
+
+                  <Spacer size="12" />
+                    <Box flexDirection="column" alignHorizontal="left">
+                      <Text color="white" align="left" size="14">
+                        {displayName}
+                      </Text>
+                      <Text color="grey" align="left" size="12">
+                        @{username}
+                      </Text>
+                    </Box>
+                  </Box>
+                <Spacer size="22" />
+                {Number(totalStorageLeft) <= 0 ? (
+                  <Text align="center" color="red" size="16">
+                    💾 Out of storage!
+                  </Text>
+                ) : (
+                  <Box flexDirection="row" justifyContent="center">
+                  <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
+                  <Spacer size="4" />
+                  <Text color="white" align="center" size="16">storage left!</Text>
+                </Box>
+                )}
+                <Spacer size="32" />
+                <Box flexDirection="row" justifyContent="center">
+                    <Text color="white" align="center" size="14">created by</Text>
+                    <Spacer size="6" />
+                    <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                </Box>
+            </VStack>
+        </Box>
+      ),
       intents: [
         <Button action={`/gift/${toFid}`}>Gift</Button>,
         <Button.Reset>Cancel</Button.Reset>,
@@ -400,99 +452,6 @@ app.frame('/show/:fid', async (c) => {
     });
   }
 });
-
-
-app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
-  const { toFid, totalStorageLeft } = c.req.param();
-
-  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || '',
-    },
-  });
-
-  // Check if the response is successful
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`);
-  }
-
-  // Parse the JSON response
-  const data = await response.json();
-  const userData = data.users[0];
-
-  // Check if userData and necessary properties exist
-  if (!userData || !userData.pfp_url || !userData.username || !userData.display_name) {
-    throw new Error('User data is missing required properties.');
-  }
-
-  console.log(`Profile Picture URL: ${userData.pfp_url}`);
-  console.log(`Username: ${userData.username}`);
-  console.log(`Total Storage Left: ${totalStorageLeft}`);  
-
-  return c.res({
-    image: (
-        <Box
-          grow
-          alignVertical="center"
-          backgroundColor="black"
-          padding="48"
-          textAlign="center"
-          height="100%"
-        >
-          <VStack gap="4">
-              <Image
-                  height="24"
-                  objectFit="cover"
-                  src="/images/polygon.png"
-                />
-              <Spacer size="32" />
-              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-                
-                <img
-                    height="96"
-                    width="96"
-                    src={userData.pfp_url}
-                    style={{
-                      borderRadius: "38%",
-                      border: "3.5px solid #6212EC",
-                    }}
-                  />
-
-                <Spacer size="12" />
-                  <Box flexDirection="column" alignHorizontal="left">
-                    <Text color="white" align="left" size="14">
-                      {userData.display_name}
-                    </Text>
-                    <Text color="grey" align="left" size="12">
-                      @{userData.username}
-                    </Text>
-                  </Box>
-                </Box>
-              <Spacer size="22" />
-              {Number(totalStorageLeft) <= 0 ? (
-                <Text align="center" color="red" size="16">
-                  💾 Out of storage!
-                </Text>
-              ) : (
-                <Box flexDirection="row" justifyContent="center">
-                <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
-                <Spacer size="4" />
-                <Text color="white" align="center" size="16">storage left!</Text>
-              </Box>
-              )}
-              <Spacer size="32" />
-              <Box flexDirection="row" justifyContent="center">
-                  <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="6" />
-                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-              </Box>
-          </VStack>
-      </Box>
-    ),
-  })
-})
 
 
 app.frame('/gift/:toFid', async (c) => {
@@ -751,7 +710,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
