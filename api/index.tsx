@@ -109,9 +109,7 @@ app.frame('/', (c) => {
 
 
 app.frame('/dashboard', async (c) => {
-  // const { fid } = c.var.interactor || {}
-
-  const fid = "397668"
+  const { fid } = c.var.interactor || {}
 
   try {
 
