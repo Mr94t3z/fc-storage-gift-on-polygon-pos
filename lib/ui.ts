@@ -3,17 +3,22 @@ import { createSystem } from "frog/ui";
 export const { Box, Columns, Column, Image, Heading, Text, VStack, Spacer, vars } = createSystem({
   colors: {
     white: "white",
-    black: "rgb(32,49,71)",
+    black: "rgb(10,9,13)",
+    purple: "rgb(98,18,236)",
     red: "rgb(253,39,74)",
-    tosca: "rgb(157,204,237)",
-    blue: 'rgb(18,169,255)',
-    grey: 'rgba(128, 128, 128, 0.75)',
+    grey: 'rgb(135,134,139)',
   },
   fonts: {
     default: [
       {
-        name: "Space Mono",
+        name: "Rubik",
         source: "google",
+        weight: 400,
+      },
+      {
+        name: "Rubik",
+        source: "google",
+        weight: 600,
       },
     ],
   },

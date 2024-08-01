@@ -31,13 +31,12 @@ export const glideClient = createGlideClient({
   projectId: process.env.GLIDE_PROJECT_ID,
  
   // Lists the chains where payments will be accepted
-  chains: [Chains.Arbitrum, Chains.Optimism],
+  chains: [Chains.Polygon, Chains.Optimism],
 });
 
 const baseUrl = "https://warpcast.com/~/compose";
 const text = "FC Storage Gift 💾\nFrame by @0x94t3z.eth";
 const embedUrl = "https://fc-storage-gift.vercel.app/api/frame";
-const logo = "https://raw.githubusercontent.com/Mr94t3z/fc-storage-gift/master/public/images/arb.png";
 
 const CAST_INTENS = `${baseUrl}?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(embedUrl)}`;
 
@@ -47,6 +46,10 @@ export const app = new Frog({
   ui: { vars },
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
+  title: 'Farcaster Storage Gift',
+  headers: {
+    'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
+  },
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY || '',
@@ -65,7 +68,6 @@ const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
 // Initial frame
 app.frame('/', (c) => {
   return c.res({
-    title: 'Farcaster Storage Gift',
     image: (
       <Box
           grow
@@ -76,116 +78,34 @@ app.frame('/', (c) => {
           height="48"
         >
           <VStack gap="4">
-              <Box flexDirection="row">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src="/images/arb.png"
-                  />
-                <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
-                  Arbitrum One
-                </Text>
-              </Box>
-              <Spacer size="16" />
-              <Heading color="white" weight="900" align="center" size="32">
+              <Image
+                  height="24"
+                  objectFit="cover"
+                  src="/images/polygon.png"
+                />
+              <Spacer size="32" />
+              <Heading color="white" weight="600" align="center" size="32">
                 Farcaster Storage Gift 
               </Heading>
               <Spacer size="22" />
               <Text align="center" color="grey" size="14">
                 Gift storage to the users you follow who are low on storage!
               </Text> <Text align="center" color="grey" size="14">
-                Powered by Arbitrum.
+                Powered by Polygon PoS.
               </Text>
               <Spacer size="22" />
               <Box flexDirection="row" justifyContent="center">
                   <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="10" />
-                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  <Spacer size="6" />
+                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z.eth</Text>
               </Box>
           </VStack>
       </Box>
     ),
     intents: [
       <Button action='/dashboard'>Start</Button>,
-      <Button.AddCastAction action='/fc-storage-gift'>
-        Install Action
-      </Button.AddCastAction>,
     ]
   })
-})
-
-
-app.castAction(
-  '/fc-storage-gift',
-  (c) => {
-    // Stringify the entire castId object
-    const castId = JSON.stringify(c.actionData.castId);
-
-    // Parse the message back to an object to extract fid
-    const parsedCastId = JSON.parse(castId);
-    const toFid = parsedCastId.fid;
-
-    return c.frame({ path: `/fc-storage-gift-frame/${toFid}`})
-  }, 
-  { name: "Storage Gift", icon: "database", description: "a cast action to gift farcaster storage.", aboutUrl: "https://warpcast.com/0x94t3z.eth"}
-)
-
-
-app.frame('/fc-storage-gift-frame/:toFid', async (c) => {
-  const { toFid } = c.req.param();
-
-  try {
-
-    return c.res({
-      action: `/tx-status`,
-      image: `/gift-image/${toFid}`,
-      intents: [
-        <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
-      ]
-    })
-    } catch (error) {
-      return c.res({
-        image: (
-          <Box
-              grow
-              alignVertical="center"
-              backgroundColor="black"
-              padding="48"
-              textAlign="center"
-              height="100%"
-          >
-              <VStack gap="4">
-                  <Box flexDirection="row">
-                    <Image
-                        height="24"
-                        objectFit="cover"
-                        src="/images/arb.png"
-                      />
-                    <Spacer size="10" />
-                    <Text color="tosca" decoration="underline" align="center" size="14">
-                      Arbitrum One
-                    </Text>
-                  </Box>
-                  <Spacer size="16" />
-                  <Heading color="white" weight="900" align="center" size="32">
-                    ⚠️ Failed ⚠️
-                  </Heading>
-                  <Spacer size="22" />
-                  <Text align="center" color="grey" size="16">
-                     Uh oh, something went wrong!
-                  </Text>
-                  <Spacer size="22" />
-                  <Box flexDirection="row" justifyContent="center">
-                      <Text color="white" align="center" size="14">created by</Text>
-                      <Spacer size="10" />
-                      <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-                  </Box>
-              </VStack>
-          </Box>
-        ),
-    });
-    }
 })
 
 
@@ -213,18 +133,12 @@ app.frame('/dashboard', async (c) => {
             height="100%"
         >
             <VStack gap="4">
-                <Box flexDirection="row">
-                  <Image
+                <Image
                       height="24"
                       objectFit="cover"
-                      src="/images/arb.png"
+                      src="/images/polygon.png"
                     />
-                  <Spacer size="10" />
-                  <Text color="tosca" decoration="underline" align="center" size="14">
-                    Arbitrum One
-                  </Text>
-                </Box>
-                <Spacer size="16" />
+                <Spacer size="24" />
                 <Heading color="white" weight="900" align="center" size="32">
                   ⚠️ Failed ⚠️
                 </Heading>
@@ -264,10 +178,8 @@ app.image('/dashboard-image/:fid', async (c) => {
   const userData = data.users[0];
 
   return c.res({
-    imageOptions: {
-      headers: {
-        'Cache-Control': 'max-age=0',
-      },
+    headers: {
+      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
     },
     image: (
       <Box
@@ -279,35 +191,13 @@ app.image('/dashboard-image/:fid', async (c) => {
         height="100%"
       >
         <VStack gap="4">
-            <Box flexDirection="row">
-              <Image
-                  height="24"
-                  objectFit="cover"
-                  src={logo}
-                />
-              <Spacer size="10" />
-              <Text color="tosca" decoration="underline" align="center" size="14">
-                Arbitrum One
-              </Text>
-            </Box>
-            <Spacer size="22" />
+            <Image
+                height="24"
+                objectFit="cover"
+                src="/images/polygon.png"
+              />
+            <Spacer size="24" />
             <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
-              {/* <Box 
-                borderStyle="solid" 
-                borderRadius="42"
-                borderWidth="4" 
-                borderColor="blue" 
-                height="64" 
-                width="64" 
-              >
-                <Image
-                  borderRadius="38"
-                  height="56"
-                  width="56"
-                  objectFit="cover"
-                  src={userData.pfp_url}
-                />
-              </Box> */}
 
               <img
                   height="128"
@@ -315,7 +205,7 @@ app.image('/dashboard-image/:fid', async (c) => {
                   src={userData.pfp_url}
                   style={{
                     borderRadius: "38%",
-                    border: "3.5px solid #12A9FF",
+                    border: "3.5px solid #6212EC",
                   }}
                 />
               
@@ -330,14 +220,14 @@ app.image('/dashboard-image/:fid', async (c) => {
                 </Box>
             </Box>
             <Spacer size="22" />
-            <Text align="center" color="blue" size="16">
+            <Text align="center" color="purple" size="16">
               Do you want to find them?
             </Text>
             <Spacer size="22" />
             <Box flexDirection="row" justifyContent="center">
                 <Text color="white" align="center" size="14">created by</Text>
-                <Spacer size="10" />
-                <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                <Spacer size="4" />
+                <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
             </Box>
         </VStack>
     </Box>
@@ -476,30 +366,24 @@ app.frame('/show/:fid', async (c) => {
             height="100%"
         >
             <VStack gap="4">
-                <Box flexDirection="row">
-                  <Image
-                      height="24"
-                      objectFit="cover"
-                      src="/images/arb.png"
-                    />
-                  <Spacer size="10" />
-                  <Text color="tosca" decoration="underline" align="center" size="14">
-                    Arbitrum One
-                  </Text>
-                </Box>
-                <Spacer size="16" />
-                <Heading color="white" weight="900" align="center" size="32">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/polygon.png"
+                  />
+                <Spacer size="32" />
+                <Heading color="white" weight="600" align="center" size="32">
                   ⚠️ Failed ⚠️
                 </Heading>
                 <Spacer size="22" />
                 <Text align="center" color="grey" size="16">
                    Uh oh, something went wrong!
                 </Text>
-                <Spacer size="22" />
+                <Spacer size="32" />
                 <Box flexDirection="row" justifyContent="center">
-                    <Text color="white" align="center" size="14">created by</Text>
-                    <Spacer size="10" />
-                    <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="6" />
+                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
                 </Box>
             </VStack>
         </Box>
@@ -527,10 +411,8 @@ app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
   const userData = data.users[0];
 
   return c.res({
-    imageOptions: {
-      headers: {
-        'Cache-Control': 'max-age=0',
-      },
+    headers: {
+      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
     },
     image: (
         <Box
@@ -542,18 +424,12 @@ app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
           height="100%"
         >
           <VStack gap="4">
-              <Box flexDirection="row">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src={logo}
-                  />
-                <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
-                  Arbitrum One
-                </Text>
-              </Box>
-              <Spacer size="22" />
+              <Image
+                  height="24"
+                  objectFit="cover"
+                  src="/images/polygon.png"
+                />
+              <Spacer size="32" />
               <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
                 
                 <img
@@ -562,7 +438,7 @@ app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
                     src={userData.pfp_url}
                     style={{
                       borderRadius: "38%",
-                      border: "3.5px solid #12A9FF",
+                      border: "3.5px solid #6212EC",
                     }}
                   />
 
@@ -583,16 +459,16 @@ app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
                 </Text>
               ) : (
                 <Box flexDirection="row" justifyContent="center">
-                <Text color="blue" align="center" size="16">💾 {totalStorageLeft}</Text>
-                <Spacer size="10" />
+                <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
+                <Spacer size="4" />
                 <Text color="white" align="center" size="16">storage left!</Text>
               </Box>
               )}
-              <Spacer size="22" />
+              <Spacer size="32" />
               <Box flexDirection="row" justifyContent="center">
                   <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="10" />
-                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  <Spacer size="6" />
+                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
               </Box>
           </VStack>
       </Box>
@@ -605,7 +481,6 @@ app.frame('/gift/:toFid', async (c) => {
   const { toFid } = c.req.param();
 
   try {
-
     return c.res({
       action: `/tx-status`,
       image: `/gift-image/${toFid}`,
@@ -626,31 +501,25 @@ app.frame('/gift/:toFid', async (c) => {
               height="100%"
           >
               <VStack gap="4">
-                  <Box flexDirection="row">
-                    <Image
-                        height="24"
-                        objectFit="cover"
-                        src="/images/arb.png"
-                      />
-                    <Spacer size="10" />
-                    <Text color="tosca" decoration="underline" align="center" size="14">
-                      Arbitrum One
-                    </Text>
-                  </Box>
-                  <Spacer size="16" />
-                  <Heading color="white" weight="900" align="center" size="32">
-                    ⚠️ Failed ⚠️
-                  </Heading>
-                  <Spacer size="22" />
-                  <Text align="center" color="grey" size="16">
-                     Uh oh, something went wrong!
-                  </Text>
-                  <Spacer size="22" />
-                  <Box flexDirection="row" justifyContent="center">
-                      <Text color="white" align="center" size="14">created by</Text>
-                      <Spacer size="10" />
-                      <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-                  </Box>
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/polygon.png"
+                  />
+                <Spacer size="32" />
+                <Heading color="white" weight="600" align="center" size="32">
+                  ⚠️ Failed ⚠️
+                </Heading>
+                <Spacer size="22" />
+                <Text align="center" color="grey" size="16">
+                   Uh oh, something went wrong!
+                </Text>
+                <Spacer size="32" />
+                <Box flexDirection="row" justifyContent="center">
+                  <Text color="white" align="center" size="14">created by</Text>
+                  <Spacer size="6" />
+                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                </Box>
               </VStack>
           </Box>
         ),
@@ -677,10 +546,8 @@ app.image('/gift-image/:toFid', async (c) => {
   const userData = data.users[0];
 
   return c.res({
-    imageOptions: {
-      headers: {
-        'Cache-Control': 'max-age=0',
-      },
+    headers: {
+      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
     },
     image: (
       <Box
@@ -692,18 +559,12 @@ app.image('/gift-image/:toFid', async (c) => {
         height="100%"
       >
         <VStack gap="4">
-            <Box flexDirection="row">
-              <Image
-                  height="24"
-                  objectFit="cover"
-                  src={logo}
-                />
-              <Spacer size="10" />
-              <Text color="tosca" decoration="underline" align="center" size="14">
-                Arbitrum One
-              </Text>
-            </Box>
-            <Spacer size="22" />
+            <Image
+                height="24"
+                objectFit="cover"
+                src="/images/polygon.png"
+              />
+            <Spacer size="32" />
             <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
 
               <img
@@ -712,7 +573,7 @@ app.image('/gift-image/:toFid', async (c) => {
                   src={userData.pfp_url}
                   style={{
                     borderRadius: "38%",
-                    border: "3.5px solid #12A9FF",
+                    border: "3.5px solid #6212EC",
                   }}
                 />
               
@@ -730,15 +591,15 @@ app.image('/gift-image/:toFid', async (c) => {
             <Box flexDirection="row" justifyContent="center">
               <Text color="white" align="center" size="16">Do you want to gift</Text>
               <Spacer size="10" />
-              <Text color="blue" align="center" size="16">@{userData.username}</Text>
+              <Text color="purple" align="center" size="16">@{userData.username}</Text>
               <Spacer size="10" />
               <Text color="white" align="center" size="16">?</Text>
             </Box>
-            <Spacer size="22" />
+            <Spacer size="32" />
             <Box flexDirection="row" justifyContent="center">
                 <Text color="white" align="center" size="14">created by</Text>
-                <Spacer size="10" />
-                <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                <Spacer size="6" />
+                <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
             </Box>
         </VStack>
     </Box>
@@ -771,7 +632,7 @@ async (c) => {
    
     // Optional. Setting this restricts the user to only
     // pay with the specified currency.
-    paymentCurrency: CurrenciesByChain.ArbitrumOneMainnet.ETH,
+    paymentCurrency: CurrenciesByChain.PolygonMainnet.MATIC,
     
     transaction: {
       chainId: Chains.Optimism.caip2,
@@ -790,7 +651,7 @@ async (c) => {
   }
 
   return c.send({
-    chainId: Chains.Arbitrum.caip2,
+    chainId: Chains.Polygon.caip2,
     to: unsignedTransaction.to,
     data: unsignedTransaction.input || undefined,
     value: hexToBigInt(unsignedTransaction.value),
@@ -810,7 +671,7 @@ app.frame("/tx-status", async (c) => {
  
   try {
     let session = await glideClient.getSessionByPaymentTransaction({
-      chainId: Chains.Arbitrum.caip2,
+      chainId: Chains.Optimism.caip2,
       txHash,
     });
  
@@ -828,29 +689,23 @@ app.frame("/tx-status", async (c) => {
           height="100%"
         >
           <VStack gap="4">
-              <Box flexDirection="row">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src="/images/arb.png"
-                  />
-                <Spacer size="10" />
-                <Text color="tosca" decoration="underline" align="center" size="14">
-                  Arbitrum One
-                </Text>
-              </Box>
-              <Spacer size="16" />
-              <Heading color="white" weight="900" align="center" size="32">
+              <Image
+                  height="24"
+                  objectFit="cover"
+                  src="/images/polygon.png"
+                />
+              <Spacer size="32" />
+              <Heading color="white" weight="600" align="center" size="32">
                 Status
               </Heading>
               <Spacer size="22" />
-              <Text align="center" color="blue" size="16">
+              <Text align="center" color="purple" size="16">
                 Storage gifted successfully!
               </Text>
-              <Spacer size="22" />
+              <Spacer size="32" />
               <Box flexDirection="row" justifyContent="center">
                   <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="10" />
+                  <Spacer size="6" />
                   <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
               </Box>
           </VStack>
