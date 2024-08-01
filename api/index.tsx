@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -35,8 +35,8 @@ export const glideClient = createGlideClient({
 });
 
 const baseUrl = "https://warpcast.com/~/compose";
-const text = "FC Storage Gift 💾\nFrame by @0x94t3z.eth";
-const embedUrl = "https://fc-storage-gift.vercel.app/api/frame";
+const text = "FC Storage Gift 💾\n\nFrame by @0x94t3z.eth";
+const embedUrl = "https://fc-storage-gift-on-polygon-pos.vercel.app/api/frame";
 
 const CAST_INTENS = `${baseUrl}?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(embedUrl)}`;
 
@@ -52,7 +52,7 @@ export const app = new Frog({
   },
 }).use(
   neynar({
-    apiKey: process.env.NEYNAR_API_KEY || '',
+    apiKey: process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
     features: ['interactor', 'cast'],
   }),
 )
@@ -736,7 +736,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
