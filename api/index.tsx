@@ -260,15 +260,10 @@ app.frame('/show/:fid', async (c) => {
     const followingData = await followingResponse.json();
 
     // Batch processing
+    const chunkSize = 15;
     const chunkedUsers = [];
-    if (Array.isArray(followingData.users)) {
-        const chunkSize = 15;
-        for (let i = 0; i < followingData.users.length; i += chunkSize) {
-            chunkedUsers.push(followingData.users.slice(i, i + chunkSize));
-        }
-    } else {
-        console.error('followingData.users is not an array or is undefined');
-        // Handle or throw an error as appropriate
+    for (let i = 0; i < followingData.users.length; i += chunkSize) {
+        chunkedUsers.push(followingData.users.slice(i, i + chunkSize));
     }
 
     // Array to store promises for storage requests
@@ -276,8 +271,8 @@ app.frame('/show/:fid', async (c) => {
 
     // Iterate over each chunk and make separate requests for storage data
     for (const chunk of chunkedUsers) {
-         const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; display_name: any; username: any; pfp_url: any; }; }) => {
-            if (userData && userData.user && userData.user.fid !== undefined &&  userData.user.display_name && userData.user.username && userData.user.pfp_url) {
+        const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; username: any; pfp_url: any; }; }) => {
+            if (userData && userData.user && userData.user.fid !== undefined && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
 
                 // Check if storage data is already cached
@@ -342,7 +337,6 @@ app.frame('/show/:fid', async (c) => {
     // Get the follower chosen to gift storage
     const toFid = displayData.length > 0 ? displayData[0].fid : null;
 
-    // Get the total storage left of the follower chosen to gift storage
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
 
     return c.res({
