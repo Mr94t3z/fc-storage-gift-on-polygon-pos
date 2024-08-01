@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,6 +26,7 @@ async function getFromCache(key: string) {
 async function cacheData(key: string, data: any) {
     cache[key] = data;
 }
+
 
 export const glideClient = createGlideClient({
   projectId: process.env.GLIDE_PROJECT_ID,
@@ -47,9 +48,6 @@ export const app = new Frog({
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
   title: 'Farcaster Storage Gift',
-  headers: {
-    'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
-  },
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
@@ -64,6 +62,7 @@ let currentPage = 1;
 
 // Neynar API base URL
 const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
+
 
 // Initial frame
 app.frame('/', (c) => {
@@ -110,7 +109,9 @@ app.frame('/', (c) => {
 
 
 app.frame('/dashboard', async (c) => {
-  const { fid } = c.var.interactor || {}
+  // const { fid } = c.var.interactor || {}
+
+  const fid = "397668"
 
   try {
 
@@ -178,9 +179,6 @@ app.image('/dashboard-image/:fid', async (c) => {
   const userData = data.users[0];
 
   return c.res({
-    headers: {
-      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
-    },
     image: (
       <Box
         grow
@@ -257,6 +255,7 @@ app.frame('/show/:fid', async (c) => {
         'api_key': process.env.NEYNAR_API_KEY || '',
       },
     });
+
     const followingData = await followingResponse.json();
 
     // Batch processing
@@ -274,6 +273,8 @@ app.frame('/show/:fid', async (c) => {
         const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; username: any; pfp_url: any; }; }) => {
             if (userData && userData.user && userData.user.fid !== undefined && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
+                const username = userData.user.username;
+                const pfp_url = userData.user.pfp_url;
 
                 // Check if storage data is already cached
                 let storageData = await getFromCache(followingFid);
@@ -286,6 +287,8 @@ app.frame('/show/:fid', async (c) => {
                         },
                     });
                     storageData = await storageResponse.json();
+
+                    console.log(`Storage data for ${username}:`, storageData);
 
                     // Cache the storage data
                     await cacheData(followingFid, storageData);
@@ -302,6 +305,8 @@ app.frame('/show/:fid', async (c) => {
 
                     return {
                         fid: followingFid,
+                        username: username,
+                        pfp_url: pfp_url,
                         totalStorageLeft: totalStorageLeft,
                     };
                 }
@@ -342,49 +347,46 @@ app.frame('/show/:fid', async (c) => {
     return c.res({
       image: `/show-image/${toFid}/${totalStorageLeft}`,
       intents: [
-          <Button action={`/gift/${toFid}`}>Gift</Button>,
-          <Button.Reset>Cancel</Button.Reset>,
-         currentPage > 1 && <Button value="back">← Back</Button>,
+        <Button action={`/gift/${toFid}`}>Gift</Button>,
+        <Button.Reset>Cancel</Button.Reset>,
+        currentPage > 1 && <Button value="back">← Back</Button>,
         currentPage < totalPages && <Button value="next">Next →</Button>,
       ],
     });
   } catch (error) {
+    console.error('Unhandled error:', error);
     return c.res({
       image: (
         <Box
-            grow
-            alignVertical="center"
-            backgroundColor="black"
-            padding="48"
-            textAlign="center"
-            height="100%"
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
         >
-            <VStack gap="4">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src="/images/polygon.png"
-                  />
-                <Spacer size="32" />
-                <Heading color="white" weight="600" align="center" size="32">
-                  ⚠️ Failed ⚠️
-                </Heading>
-                <Spacer size="22" />
-                <Text align="center" color="grey" size="16">
-                   Uh oh, something went wrong!
-                </Text>
-                <Spacer size="32" />
-                <Box flexDirection="row" justifyContent="center">
-                  <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="6" />
-                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-                </Box>
-            </VStack>
+          <VStack gap="4">
+            <Image height="24" objectFit="cover" src="/images/polygon.png" />
+            <Spacer size="32" />
+            <Heading color="white" weight="600" align="center" size="32">
+              ⚠️ Failed ⚠️
+            </Heading>
+            <Spacer size="22" />
+            <Text align="center" color="grey" size="16">
+              Uh oh, something went wrong!
+            </Text>
+            <Spacer size="32" />
+            <Box flexDirection="row" justifyContent="center">
+              <Text color="white" align="center" size="14">created by</Text>
+              <Spacer size="6" />
+              <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+            </Box>
+          </VStack>
         </Box>
       ),
       intents: [
         <Button.Reset>Try again</Button.Reset>,
-      ]
+      ],
     });
   }
 });
@@ -401,13 +403,25 @@ app.image('/show-image/:toFid/:totalStorageLeft', async (c) => {
     },
   });
 
+  // Check if the response is successful
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+  }
+
+  // Parse the JSON response
   const data = await response.json();
   const userData = data.users[0];
 
+  // Check if userData and necessary properties exist
+  if (!userData || !userData.pfp_url || !userData.username || !userData.display_name) {
+    throw new Error('User data is missing required properties.');
+  }
+
+  console.log(`Profile Picture URL: ${userData.pfp_url}`);
+  console.log(`Username: ${userData.username}`);
+  console.log(`Total Storage Left: ${totalStorageLeft}`);  
+
   return c.res({
-    headers: {
-      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
-    },
     image: (
         <Box
           grow
@@ -540,9 +554,6 @@ app.image('/gift-image/:toFid', async (c) => {
   const userData = data.users[0];
 
   return c.res({
-    headers: {
-      'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
-    },
     image: (
       <Box
         grow
@@ -730,7 +741,7 @@ app.frame("/tx-status", async (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
