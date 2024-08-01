@@ -258,6 +258,13 @@ app.frame('/show/:fid', async (c) => {
 
     const followingData = await followingResponse.json();
 
+    // Ensure followingData.users is defined and is an array
+    if (!followingData.users || !Array.isArray(followingData.users)) {
+      return c.error({
+        message: 'Invalid following data received',
+      })
+    }
+
     // Batch processing
     const chunkSize = 15;
     const chunkedUsers = [];
