@@ -632,7 +632,7 @@ async (c) => {
    
     // Optional. Setting this restricts the user to only
     // pay with the specified currency.
-    paymentCurrency: CurrenciesByChain.PolygonMainnet.MATIC,
+    paymentCurrency: CurrenciesByChain.PolygonPoSMainnet.MATIC,
     
     transaction: {
       chainId: Chains.Optimism.caip2,
