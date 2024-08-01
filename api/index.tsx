@@ -258,6 +258,9 @@ app.frame('/show/:fid', async (c) => {
 
     const followingData = await followingResponse.json();
 
+    // Log followingData for debugging
+    console.log('Following data:', followingData);
+
     // Ensure followingData.users is defined and is an array
     if (!followingData.users || !Array.isArray(followingData.users)) {
       return c.error({
