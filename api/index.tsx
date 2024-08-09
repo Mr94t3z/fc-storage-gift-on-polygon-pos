@@ -37,7 +37,7 @@ export const glideClient = createGlideClient({
 
 const baseUrl = "https://warpcast.com/~/compose";
 const text = "FC Storage Gift 💾\n\nFrame by @0x94t3z.eth";
-const embedUrl = "https://fc-storage-gift-on-polygon-pos.vercel.app/api/frame";
+const embedUrl = "https://www.0x94t3z.tech/api/frame";
 
 const CAST_INTENS = `${baseUrl}?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(embedUrl)}`;
 
