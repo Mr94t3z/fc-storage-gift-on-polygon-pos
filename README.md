@@ -12,7 +12,7 @@ A Farcaster Frame is used to locate the people you follow on Farcaster who have 
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Mr94t3z/fc-storage-gift
+   git clone https://github.com/Mr94t3z/fc-storage-gift-on-polygon-pos
    ```
 2. Navigate to the project directory:
    ```bash
@@ -60,7 +60,7 @@ The contract are deployed at the following address:
 | StorageRegistry| [0x00000000fcCe7f938e7aE6D3c335bD6a1a7c593D](https://optimistic.etherscan.io/address/0x00000000fcce7f938e7ae6d3c335bd6a1a7c593d) |
 
 ## Demo
-Watch the demo on YouTube: [FC Storage Gift [DEMO]](https://youtu.be/fdFl2kvod1E)
+Watch the demo on YouTube: [FC Storage Gift [DEMO]](https://github.com/Mr94t3z/fc-storage-gift-on-polygon-pos)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
