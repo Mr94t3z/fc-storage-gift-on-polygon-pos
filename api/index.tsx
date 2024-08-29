@@ -37,13 +37,13 @@ export const glideClient = createGlideClient({
 
 const baseUrl = "https://warpcast.com/~/compose";
 const text = "FC Storage Gift 💾\n\nFrame by @0x94t3z.eth";
-const embedUrl = "https://pos.0x94t3z.tech/";
+const embedUrl = "https://pos.0x94t3z.tech/api/frame";
 
 const CAST_INTENS = `${baseUrl}?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(embedUrl)}`;
 
 export const app = new Frog({
   assetsPath: '/',
-  basePath: '/',
+  basePath: '/api/frame',
   ui: { vars },
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
