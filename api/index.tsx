@@ -818,7 +818,7 @@ async (c) => {
 
 
 app.frame("/tx-status/:toFid", async (c) => {
-  const { transactionId, buttonValue } = c;
+  const { transactionId } = c;
 
   const { toFid } = c.req.param();
 
@@ -838,66 +838,32 @@ app.frame("/tx-status/:toFid", async (c) => {
   const data = await response.json();
   const userData = data.users[0];
  
-  // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
-  const txHash = transactionId || buttonValue;
+  let session = await glideClient.getSessionByPaymentTransaction({
+    chainId: Chains.Polygon.caip2,
+    transactionId,
+  });
 
-  console.log("txHash", txHash);
- 
-  if (!txHash) {
-    throw new Error("missing transaction hash");
-  }
- 
-  try {
-    let session = await glideClient.getSessionByPaymentTransaction({
-      chainId: Chains.Polygon.caip2,
-      txHash,
-    });
+  // Wait for the session to complete. It can take a few seconds
+  session = await glideClient.waitForSession(session.sessionId);
 
-    // Wait for the session to complete. It can take a few seconds
-    session = await glideClient.waitForSession(session.sessionId);
+  const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
 
-    if (session.sponsoredTransactionHash) {
+  const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
 
-      const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
+  const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
 
-      const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
-  
-      const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
- 
-      return c.res({
-        image: `/image-share-by-user/${toFid}`,
-        intents: [
-          <Button.Link
-            href={`https://optimistic.etherscan.io/tx/${session.sponsoredTransactionHash}`}
-          >
-            View on Exploler
-          </Button.Link>,
-          <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
-        ],
-      });
-    } else {
-      return c.res({
-        image: '/waiting.gif',
-        intents: [
-          <Button value={txHash} action={`/tx-status/${toFid}`}>
-            Refresh
-          </Button>,
-        ],
-      });
-    }
+  return c.res({
+    image: `/image-share-by-user/${toFid}`,
+    intents: [
+      <Button.Link
+        href={session.sponsoredTransactionUrl}
+      >
+        View on Exploler
+      </Button.Link>,
+      <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
+    ],
+  });
 
-  } catch (e) {
-    // If the session is not found, it means the payment is still pending.
-    // Let the user know that the payment is pending and show a button to refresh the status.
-    return c.res({
-      image: '/waiting.gif',
-      intents: [
-        <Button value={txHash} action={`/tx-status/${toFid}`}>
-          Refresh
-        </Button>,
-      ],
-    });
-  }
 });
 
 
