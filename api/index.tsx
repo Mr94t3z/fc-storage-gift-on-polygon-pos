@@ -840,6 +840,8 @@ app.frame("/tx-status/:toFid", async (c) => {
  
   // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
   const txHash = transactionId || buttonValue;
+
+  console.log("txHash", txHash);
  
   if (!txHash) {
     throw new Error("missing transaction hash");
