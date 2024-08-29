@@ -726,9 +726,9 @@ app.image('/gift-image/:toFid', async (c) => {
             <Spacer size="22" />
             <Box flexDirection="row" justifyContent="center">
               <Text color="white" align="center" size="16">Do you want to gift</Text>
-              <Spacer size="10" />
+              <Spacer size="6" />
               <Text color="purple" align="center" size="16">@{userData.username}</Text>
-              <Spacer size="10" />
+              <Spacer size="6" />
               <Text color="white" align="center" size="16">?</Text>
             </Box>
             <Spacer size="32" />
@@ -875,9 +875,9 @@ app.frame("/tx-status/:toFid", async (c) => {
               <Spacer size="22" />
               <Box flexDirection="row" justifyContent="center">
                 <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
-                <Spacer size="10" />
+                <Spacer size="6" />
                 <Text color="purple" align="center" size="16">@{userData.username}</Text>
-                <Spacer size="10" />
+                <Spacer size="6" />
                 <Text color="white" align="center" size="16">!</Text>
               </Box>
               <Spacer size="32" />
@@ -970,9 +970,9 @@ app.frame("/share-by-user/:toFid", async (c) => {
             <Spacer size="22" />
             <Box flexDirection="row" justifyContent="center">
               <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
-              <Spacer size="10" />
+              <Spacer size="6" />
               <Text color="purple" align="center" size="16">@{userData.username}</Text>
-              <Spacer size="10" />
+              <Spacer size="6" />
               <Text color="white" align="center" size="16">!</Text>
             </Box>
             <Spacer size="32" />
