@@ -47,7 +47,15 @@ export const app = new Frog({
   ui: { vars },
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
-  title: 'Farcaster Storage Gift',
+  title: 'FC Storage Gift on PoS',
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY || '',
+      }
+    }
+  },
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY || '',
