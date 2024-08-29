@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -874,6 +874,18 @@ app.frame("/tx-status/:toFid", async (c) => {
     });
   }
 
+  // Check if payment is successful
+  if (session.paymentStatus !== 'paid') {
+    return c.res({
+      image: '/waiting.gif',
+      intents: [
+        <Button value={transactionId} action={`/tx-status/${toFid}`}>
+          Refresh
+        </Button>,
+      ],
+    });
+  }
+
   const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
   const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
   const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
@@ -980,7 +992,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
