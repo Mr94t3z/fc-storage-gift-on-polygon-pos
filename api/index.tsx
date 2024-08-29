@@ -420,7 +420,7 @@ app.frame('/show/:fid', async (c) => {
                 ) : (
                   <Box flexDirection="row" justifyContent="center">
                   <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
-                  <Spacer size="4" />
+                  <Spacer size="6" />
                   <Text color="white" align="center" size="16">storage left!</Text>
                 </Box>
                 )}
@@ -576,7 +576,7 @@ app.frame('/search-by-username', async (c) => {
                 ) : (
                   <Box flexDirection="row" justifyContent="center">
                   <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
-                  <Spacer size="4" />
+                  <Spacer size="6" />
                   <Text color="white" align="center" size="16">storage left!</Text>
                 </Box>
                 )}
@@ -847,7 +847,7 @@ app.frame("/tx-status/:toFid", async (c) => {
  
   try {
     let session = await glideClient.getSessionByPaymentTransaction({
-      chainId: Chains.Optimism.caip2,
+      chainId: Chains.Polygon.caip2,
       txHash,
     });
  
@@ -859,6 +859,12 @@ app.frame("/tx-status/:toFid", async (c) => {
     const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
 
     const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
+
+    console.log(session);
+
+    console.log(session.sponsoredTransactionHash);
+
+    if (session.sponsoredTransactionHash) {
  
     return c.res({
       image: (
@@ -925,6 +931,17 @@ app.frame("/tx-status/:toFid", async (c) => {
         <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
       ],
     });
+  } else {
+    return c.res({
+      image: '/waiting.gif',
+      intents: [
+        <Button value={txHash} action={`/tx-status/${toFid}`}>
+          Refresh
+        </Button>,
+      ],
+    });
+  }
+
   } catch (e) {
     // If the session is not found, it means the payment is still pending.
     // Let the user know that the payment is pending and show a button to refresh the status.
