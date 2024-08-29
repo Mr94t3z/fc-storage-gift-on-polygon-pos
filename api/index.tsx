@@ -850,97 +850,39 @@ app.frame("/tx-status/:toFid", async (c) => {
       chainId: Chains.Polygon.caip2,
       txHash,
     });
- 
+
     // Wait for the session to complete. It can take a few seconds
     session = await glideClient.waitForSession(session.sessionId);
 
-    const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
-
-    const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
-
-    const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
-
-    console.log(session);
-
-    console.log(session.sponsoredTransactionHash);
-
     if (session.sponsoredTransactionHash) {
- 
-    return c.res({
-      image: (
-        <Box
-          grow
-          alignVertical="center"
-          backgroundColor="black"
-          padding="48"
-          textAlign="center"
-          height="100%"
-        >
-          <VStack gap="4">
-              <Image
-                  height="24"
-                  objectFit="cover"
-                  src="/images/polygon.png"
-                />
-              <Spacer size="32" />
-              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+
+      const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
+
+      const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
   
-                <img
-                    height="128"
-                    width="128"
-                    src={userData.pfp_url}
-                    style={{
-                      borderRadius: "38%",
-                      border: "3.5px solid #6212EC",
-                    }}
-                  />
-                
-                <Spacer size="12" />
-                  <Box flexDirection="column" alignHorizontal="left">
-                    <Text color="white" align="left" size="14">
-                      {userData.display_name}
-                    </Text>
-                    <Text color="grey" align="left" size="12">
-                      @{userData.username}
-                    </Text>
-                  </Box>
-                </Box>
-              <Spacer size="22" />
-              <Box flexDirection="row" justifyContent="center">
-                <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
-                <Spacer size="6" />
-                <Text color="purple" align="center" size="16">@{userData.username}</Text>
-                <Spacer size="6" />
-                <Text color="white" align="center" size="16">!</Text>
-              </Box>
-              <Spacer size="32" />
-              <Box flexDirection="row" justifyContent="center">
-                  <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="6" />
-                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-              </Box>
-          </VStack>
-      </Box>
-      ),
-      intents: [
-        <Button.Link
-          href={`https://optimistic.etherscan.io/tx/${session.sponsoredTransactionHash}`}
-        >
-          View on Exploler
-        </Button.Link>,
-        <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
-      ],
-    });
-  } else {
-    return c.res({
-      image: '/waiting.gif',
-      intents: [
-        <Button value={txHash} action={`/tx-status/${toFid}`}>
-          Refresh
-        </Button>,
-      ],
-    });
-  }
+      const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
+ 
+      return c.res({
+        image: `/image-share-by-user/${toFid}`,
+        intents: [
+          <Button.Link
+            href={`https://optimistic.etherscan.io/tx/${session.sponsoredTransactionHash}`}
+          >
+            View on Exploler
+          </Button.Link>,
+          <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
+        ],
+      });
+    } else {
+      return c.res({
+        image: '/waiting.gif',
+        intents: [
+          <Button value={txHash} action={`/tx-status/${toFid}`}>
+            Refresh
+          </Button>,
+        ],
+      });
+    }
 
   } catch (e) {
     // If the session is not found, it means the payment is still pending.
@@ -958,7 +900,18 @@ app.frame("/tx-status/:toFid", async (c) => {
 
 
 app.frame("/share-by-user/:toFid", async (c) => {
+  const { toFid } = c.req.param();
+ 
+  return c.res({
+    image: `/image-share-by-user/${toFid}`,
+    intents: [
+      <Button action='/'>Give it a try!</Button>,
+    ],
+  });
+});
 
+
+app.image("/image-share-by-user/:toFid", async (c) => {
   const { toFid } = c.req.param();
 
   const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
@@ -1033,9 +986,6 @@ app.frame("/share-by-user/:toFid", async (c) => {
         </VStack>
     </Box>
     ),
-    intents: [
-      <Button action='/'>Give it a try!</Button>,
-    ],
   });
 });
 
