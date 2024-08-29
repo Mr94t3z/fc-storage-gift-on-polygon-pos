@@ -795,8 +795,21 @@ async (c) => {
 })
 
 
-app.frame("/tx-status", async (c) => {
+app.frame("/tx-status/:toFid", async (c) => {
   const { transactionId, buttonValue } = c;
+
+  const { toFid } = c.req.param();
+
+  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'api_key': process.env.NEYNAR_API_KEY || '',
+    },
+  });
+
+  const data = await response.json();
+  const userData = data.users[0];
  
   // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
   const txHash = transactionId || buttonValue;
@@ -813,6 +826,12 @@ app.frame("/tx-status", async (c) => {
  
     // Wait for the session to complete. It can take a few seconds
     session = await glideClient.waitForSession(session.sessionId);
+
+    const shareText = `I just gifted storage to @${userData.username} on PoS @polygon!\n\nFrame by @0x94t3z.eth`;
+
+    const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
+
+    const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
  
     return c.res({
       image: (
@@ -831,18 +850,41 @@ app.frame("/tx-status", async (c) => {
                   src="/images/polygon.png"
                 />
               <Spacer size="32" />
-              <Heading color="white" weight="600" align="center" size="32">
-                Status
-              </Heading>
+              <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+  
+                <img
+                    height="128"
+                    width="128"
+                    src={userData.pfp_url}
+                    style={{
+                      borderRadius: "38%",
+                      border: "3.5px solid #6212EC",
+                    }}
+                  />
+                
+                <Spacer size="12" />
+                  <Box flexDirection="column" alignHorizontal="left">
+                    <Text color="white" align="left" size="14">
+                      {userData.display_name}
+                    </Text>
+                    <Text color="grey" align="left" size="12">
+                      @{userData.username}
+                    </Text>
+                  </Box>
+                </Box>
               <Spacer size="22" />
-              <Text align="center" color="purple" size="16">
-                Storage gifted successfully!
-              </Text>
+              <Box flexDirection="row" justifyContent="center">
+                <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
+                <Spacer size="10" />
+                <Text color="purple" align="center" size="16">@{userData.username}</Text>
+                <Spacer size="10" />
+                <Text color="white" align="center" size="16">!</Text>
+              </Box>
               <Spacer size="32" />
               <Box flexDirection="row" justifyContent="center">
                   <Text color="white" align="center" size="14">created by</Text>
                   <Spacer size="6" />
-                  <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
               </Box>
           </VStack>
       </Box>
@@ -853,7 +895,7 @@ app.frame("/tx-status", async (c) => {
         >
           View on Exploler
         </Button.Link>,
-        <Button.Reset>Home</Button.Reset>,
+        <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
       ],
     });
   } catch (e) {
@@ -862,12 +904,90 @@ app.frame("/tx-status", async (c) => {
     return c.res({
       image: '/waiting.gif',
       intents: [
-        <Button value={txHash} action="/tx-status">
+        <Button value={txHash} action={`/tx-status/${toFid}`}>
           Refresh
         </Button>,
       ],
     });
   }
+});
+
+
+app.frame("/share-by-user/:toFid", async (c) => {
+
+  const { toFid } = c.req.param();
+
+  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'api_key': process.env.NEYNAR_API_KEY || '',
+    },
+  });
+
+  const data = await response.json();
+  const userData = data.users[0];
+ 
+  return c.res({
+    image: (
+      <Box
+        grow
+        alignVertical="center"
+        backgroundColor="black"
+        padding="48"
+        textAlign="center"
+        height="100%"
+      >
+        <VStack gap="4">
+            <Image
+                height="24"
+                objectFit="cover"
+                src="/images/polygon.png"
+              />
+            <Spacer size="32" />
+            <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+
+              <img
+                  height="128"
+                  width="128"
+                  src={userData.pfp_url}
+                  style={{
+                    borderRadius: "38%",
+                    border: "3.5px solid #6212EC",
+                  }}
+                />
+              
+              <Spacer size="12" />
+                <Box flexDirection="column" alignHorizontal="left">
+                  <Text color="white" align="left" size="14">
+                    {userData.display_name}
+                  </Text>
+                  <Text color="grey" align="left" size="12">
+                    @{userData.username}
+                  </Text>
+                </Box>
+              </Box>
+            <Spacer size="22" />
+            <Box flexDirection="row" justifyContent="center">
+              <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
+              <Spacer size="10" />
+              <Text color="purple" align="center" size="16">@{userData.username}</Text>
+              <Spacer size="10" />
+              <Text color="white" align="center" size="16">!</Text>
+            </Box>
+            <Spacer size="32" />
+            <Box flexDirection="row" justifyContent="center">
+                <Text color="white" align="center" size="14">created by</Text>
+                <Spacer size="6" />
+                <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+            </Box>
+        </VStack>
+    </Box>
+    ),
+    intents: [
+      <Button action='/'>Give it a try!</Button>,
+    ],
+  });
 });
 
 
