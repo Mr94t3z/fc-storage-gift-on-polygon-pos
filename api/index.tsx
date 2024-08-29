@@ -1,4 +1,4 @@
-import { Button, Frog } from 'frog'
+import { Button, Frog, TextInput } from 'frog'
 import { handle } from 'frog/vercel'
 import { neynar } from 'frog/middlewares'
 import { Box, Image, Heading, Text, VStack, Spacer, vars } from "../lib/ui.js";
@@ -50,7 +50,7 @@ export const app = new Frog({
   title: 'Farcaster Storage Gift',
 }).use(
   neynar({
-    apiKey: process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
+    apiKey: process.env.NEYNAR_API_KEY || '',
     features: ['interactor', 'cast'],
   }),
 )
@@ -116,8 +116,10 @@ app.frame('/dashboard', async (c) => {
     return c.res({
       image: `/dashboard-image/${fid}`,
       intents: [
-        <Button action={`/show/${fid}`}>Yes, please!</Button>,
-        <Button.Reset>No</Button.Reset>
+        <TextInput placeholder="Search by username" />,
+        <Button action={`/show/${fid}`}>Let's go!</Button>,
+        <Button action='/search-by-username'>Search 🔎</Button>,
+        <Button.Reset>Cancel</Button.Reset>
       ],
     });
   } catch (error) {
@@ -411,6 +413,160 @@ app.frame('/show/:fid', async (c) => {
         <Button.Reset>Cancel</Button.Reset>,
         currentPage > 1 && <Button value="back">← Back</Button>,
         currentPage < totalPages && <Button value="next">Next →</Button>,
+      ],
+    });
+  } catch (error) {
+    console.error('Unhandled error:', error);
+    return c.res({
+      image: (
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="black"
+          padding="48"
+          textAlign="center"
+          height="100%"
+        >
+          <VStack gap="4">
+            <Image height="24" objectFit="cover" src="/images/polygon.png" />
+            <Spacer size="32" />
+            <Heading color="white" weight="600" align="center" size="32">
+              ⚠️ Failed ⚠️
+            </Heading>
+            <Spacer size="22" />
+            <Text align="center" color="grey" size="16">
+              Uh oh, something went wrong!
+            </Text>
+            <Spacer size="32" />
+            <Box flexDirection="row" justifyContent="center">
+              <Text color="white" align="center" size="14">created by</Text>
+              <Spacer size="6" />
+              <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+            </Box>
+          </VStack>
+        </Box>
+      ),
+      intents: [
+        <Button.Reset>Try again</Button.Reset>,
+      ],
+    });
+  }
+});
+
+
+app.frame('/search-by-username', async (c) => {
+  const { inputText } = c;
+
+  try {
+    // Fetch by username
+    const usernameResponse = await fetch(`${baseUrlNeynarV2}/user/search?q=${inputText}`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'api_key': process.env.NEYNAR_API_KEY || '',
+      },
+    });
+
+    const usernameData = await usernameResponse.json();
+
+    const isUserFound = usernameData?.result?.users?.[0];
+
+    if (!isUserFound) {
+      return c.error({
+        message: `@${inputText} not found!`,
+      });
+    }
+
+    const toFid = isUserFound.fid;
+    const pfpUrl = isUserFound.pfp_url;
+    const displayName = isUserFound.display_name;
+    const username = isUserFound.username;
+
+    const storageResponse = await fetch(`${baseUrlNeynarV2}/storage/usage?fid=${toFid}`, {
+      method: 'GET',
+      headers: {
+          'accept': 'application/json',
+          'api_key': process.env.NEYNAR_API_KEY || '',
+      },
+    });
+
+    const storageData = await storageResponse.json();
+
+    let totalStorageLeft = 0
+
+    if (storageData && storageData.casts && storageData.reactions && storageData.links) {
+
+      // const totalStorageCapacity = (storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity) * storageData.total_active_units;
+      const totalStorageCapacity = storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity;
+
+      const totalStorageUsed = storageData.casts.used + storageData.reactions.used + storageData.links.used;
+
+      totalStorageLeft = totalStorageCapacity - totalStorageUsed;
+    }
+
+    return c.res({
+        image: (
+          <Box
+            grow
+            alignVertical="center"
+            backgroundColor="black"
+            padding="48"
+            textAlign="center"
+            height="100%"
+          >
+            <VStack gap="4">
+                <Image
+                    height="24"
+                    objectFit="cover"
+                    src="/images/polygon.png"
+                  />
+                <Spacer size="32" />
+                <Box flexDirection="row" alignHorizontal="center" alignVertical="center">
+                  
+                  <img
+                      height="96"
+                      width="96"
+                      src={pfpUrl}
+                      style={{
+                        borderRadius: "38%",
+                        border: "3.5px solid #6212EC",
+                      }}
+                    />
+
+                  <Spacer size="12" />
+                    <Box flexDirection="column" alignHorizontal="left">
+                      <Text color="white" align="left" size="14">
+                        {displayName}
+                      </Text>
+                      <Text color="grey" align="left" size="12">
+                        @{username}
+                      </Text>
+                    </Box>
+                  </Box>
+                <Spacer size="22" />
+                {Number(totalStorageLeft) <= 0 ? (
+                  <Text align="center" color="red" size="16">
+                    💾 Out of storage!
+                  </Text>
+                ) : (
+                  <Box flexDirection="row" justifyContent="center">
+                  <Text color="purple" align="center" size="16">💾 {totalStorageLeft}</Text>
+                  <Spacer size="4" />
+                  <Text color="white" align="center" size="16">storage left!</Text>
+                </Box>
+                )}
+                <Spacer size="32" />
+                <Box flexDirection="row" justifyContent="center">
+                    <Text color="white" align="center" size="14">created by</Text>
+                    <Spacer size="6" />
+                    <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
+                </Box>
+            </VStack>
+        </Box>
+      ),
+      intents: [
+        <Button action={`/gift/${toFid}`}>Gift</Button>,
+        <Button.Reset>Cancel</Button.Reset>,
       ],
     });
   } catch (error) {

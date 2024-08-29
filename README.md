@@ -16,7 +16,7 @@ A Farcaster Frame is used to locate the people you follow on Farcaster who have 
    ```
 2. Navigate to the project directory:
    ```bash
-   cd fc-storage-gift
+   cd fc-storage-gift-on-polygon-pos
    ```
 3. Install dependencies:
    ```bash
