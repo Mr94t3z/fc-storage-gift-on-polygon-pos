@@ -621,7 +621,7 @@ app.frame('/gift/:toFid', async (c) => {
 
   try {
     return c.res({
-      action: `/tx-status`,
+      action: `/tx-status/${toFid}`,
       image: `/gift-image/${toFid}`,
       intents: [
         <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
