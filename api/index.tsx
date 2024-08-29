@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -643,7 +643,7 @@ app.frame('/gift/:toFid', async (c) => {
     return c.res({
       image: `/gift-image/${toFid}`,
       intents: [
-        <Button.Transaction target={`/tx-gift/${toFid}`} action={`/tx-status/${toFid}`}>Confirm</Button.Transaction>,
+        <Button.Transaction target={`/tx-gift/${toFid}`} action={`/refresh-tx-status/${toFid}`}>Confirm</Button.Transaction>,
         <Button action='/'>Cancel</Button>,
       ]
     })
@@ -819,9 +819,24 @@ async (c) => {
 })
 
 
-app.frame("/tx-status/:toFid", async (c) => {
-  const { transactionId, buttonValue } = c;
+app.frame("/refresh-tx-status/:toFid", async (c) => {
+  const { transactionId } = c;
   const { toFid } = c.req.param();
+ 
+  return c.res({
+    image: '/waiting.gif',
+    intents: [
+      <Button action={`/tx-status/${transactionId}/${toFid}`}>
+        Refresh
+      </Button>,
+    ],
+  });
+});
+
+
+app.frame("/tx-status/:transactionId/:toFid", async (c) => {
+  const { buttonValue } = c;
+  const { transactionId, toFid } = c.req.param();
 
   // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
   const txHash = transactionId || buttonValue;
@@ -872,7 +887,7 @@ app.frame("/tx-status/:toFid", async (c) => {
     return c.res({
       image: '/waiting.gif',
       intents: [
-        <Button value={transactionId} action={`/tx-status/${toFid}`}>
+        <Button value={txHash} action={`/tx-status/${transactionId}/${toFid}`}>
           Refresh
         </Button>,
       ],
@@ -884,7 +899,7 @@ app.frame("/tx-status/:toFid", async (c) => {
     return c.res({
       image: '/waiting.gif',
       intents: [
-        <Button value={transactionId} action={`/tx-status/${toFid}`}>
+        <Button value={txHash} action={`/tx-status/${transactionId}/${toFid}`}>
           Refresh
         </Button>,
       ],
@@ -997,7 +1012,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
