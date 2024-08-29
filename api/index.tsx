@@ -183,6 +183,11 @@ app.image('/dashboard-image/:fid', async (c) => {
     },
   });
 
+   // Ensure response is OK before parsing
+   if (!response.ok) {
+    throw new Error(`Failed to fetch following data: ${response.statusText}`);
+  }
+
   const data = await response.json();
   const userData = data.users[0];
 
@@ -264,6 +269,11 @@ app.frame('/show/:fid', async (c) => {
       },
     });
 
+    // Ensure response is OK before parsing
+    if (!followingResponse.ok) {
+      throw new Error(`Failed to fetch following data: ${followingResponse.statusText}`);
+    }
+
     const followingData = await followingResponse.json();
 
     // Batch processing
@@ -294,6 +304,13 @@ app.frame('/show/:fid', async (c) => {
                             'api_key': process.env.NEYNAR_API_KEY || '',
                         },
                     });
+
+
+                    // Ensure response is OK before parsing
+                    if (!storageResponse.ok) {
+                      throw new Error(`Failed to fetch storage data: ${storageResponse.statusText}`);
+                    }
+                    
                     storageData = await storageResponse.json();
 
                     // Cache the storage data
@@ -681,6 +698,11 @@ app.image('/gift-image/:toFid', async (c) => {
     },
   });
 
+  // Ensure response is OK before parsing
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+  }
+
   const data = await response.json();
   const userData = data.users[0];
 
@@ -808,6 +830,11 @@ app.frame("/tx-status/:toFid", async (c) => {
     },
   });
 
+  // Ensure response is OK before parsing
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+  }
+
   const data = await response.json();
   const userData = data.users[0];
  
@@ -924,6 +951,11 @@ app.frame("/share-by-user/:toFid", async (c) => {
       'api_key': process.env.NEYNAR_API_KEY || '',
     },
   });
+
+  // Ensure response is OK before parsing
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+  }
 
   const data = await response.json();
   const userData = data.users[0];
