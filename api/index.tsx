@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -48,6 +48,9 @@ export const app = new Frog({
   browserLocation: CAST_INTENS,
   imageAspectRatio: '1.91:1',
   title: 'FC Storage Gift on PoS',
+  headers: {
+    'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate max-age=0, s-maxage=0',
+  },
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -821,6 +824,13 @@ app.frame("/tx-status/:toFid", async (c) => {
   const { transactionId, buttonValue } = c;
   const { toFid } = c.req.param();
 
+  // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
+  const txHash = transactionId || buttonValue;
+  
+  if (!txHash) {
+    throw new Error("missing transaction hash");
+  }
+
   const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
     method: 'GET',
     headers: {
@@ -837,15 +847,10 @@ app.frame("/tx-status/:toFid", async (c) => {
   const data = await response.json();
   const userData = data.users[0];
 
-  // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
-  const txHash = transactionId || buttonValue;
- 
-  if (!txHash) {
-    throw new Error("missing transaction hash");
-  }
-
   let session;
   try {
+    console.log("txHash: ", txHash);
+    
     session = await glideClient.getSessionByPaymentTransaction({
       chainId: Chains.Polygon.caip2,
       txHash,
@@ -859,18 +864,6 @@ app.frame("/tx-status/:toFid", async (c) => {
     session = await glideClient.waitForSession(session.sessionId);
   } catch (error) {
     // Return with a refresh button if the session is not found or another error occurs
-    return c.res({
-      image: '/waiting.gif',
-      intents: [
-        <Button value={txHash} action={`/tx-status/${toFid}`}>
-          Refresh
-        </Button>,
-      ],
-    });
-  }
-
-  // Check if payment is successful
-  if (session.paymentStatus !== 'paid') {
     return c.res({
       image: '/waiting.gif',
       intents: [
@@ -987,7 +980,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
 
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
