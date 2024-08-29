@@ -8,8 +8,8 @@ import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
+import { devtools } from 'frog/dev';
+import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -818,15 +818,14 @@ async (c) => {
 
 
 app.frame("/tx-status/:toFid", async (c) => {
-  const { transactionId } = c;
-
+  const { transactionId, buttonValue } = c;
   const { toFid } = c.req.param();
 
   const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
     method: 'GET',
     headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || '',
+      accept: 'application/json',
+      api_key: process.env.NEYNAR_API_KEY || '',
     },
   });
 
@@ -837,33 +836,62 @@ app.frame("/tx-status/:toFid", async (c) => {
 
   const data = await response.json();
   const userData = data.users[0];
- 
-  let session = await glideClient.getSessionByPaymentTransaction({
-    chainId: Chains.Polygon.caip2,
-    transactionId,
-  });
 
-  // Wait for the session to complete. It can take a few seconds
-  session = await glideClient.waitForSession(session.sessionId);
+  // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
+  const txHash = transactionId || buttonValue;
+ 
+  if (!txHash) {
+    throw new Error("missing transaction hash");
+  }
+
+  let session;
+  try {
+    session = await glideClient.getSessionByPaymentTransaction({
+      chainId: Chains.Polygon.caip2,
+      txHash,
+    });
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    // Wait for the session to complete
+    session = await glideClient.waitForSession(session.sessionId);
+  } catch (error) {
+    // Return with a refresh button if the session is not found or another error occurs
+    return c.res({
+      image: '/waiting.gif',
+      intents: [
+        <Button value={txHash} action={`/tx-status/${toFid}`}>
+          Refresh
+        </Button>,
+      ],
+    });
+  }
+
+  // Check if payment is successful
+  if (session.paymentStatus !== 'paid') {
+    return c.res({
+      image: '/waiting.gif',
+      intents: [
+        <Button value={txHash} action={`/tx-status/${toFid}`}>
+          Refresh
+        </Button>,
+      ],
+    });
+  }
 
   const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
-
   const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
-
   const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
 
   return c.res({
     image: `/image-share-by-user/${toFid}`,
     intents: [
-      <Button.Link
-        href={session.sponsoredTransactionUrl}
-      >
-        View on Exploler
-      </Button.Link>,
+      <Button.Link href={session.sponsoredTransactionUrl}>View on Explorer</Button.Link>,
       <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
     ],
   });
-
 });
 
 
@@ -959,7 +987,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
 
 
 // Uncomment for local server testing
-// devtools(app, { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
