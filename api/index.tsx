@@ -827,7 +827,7 @@ app.frame("/tx-status/:toFid", async (c) => {
     // Wait for the session to complete. It can take a few seconds
     session = await glideClient.waitForSession(session.sessionId);
 
-    const shareText = `I just gifted storage to @${userData.username} on PoS @polygon!\n\nFrame by @0x94t3z.eth`;
+    const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
 
     const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
 
