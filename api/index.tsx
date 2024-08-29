@@ -848,6 +848,8 @@ app.frame("/tx-status/:toFid", async (c) => {
   const userData = data.users[0];
 
   let session;
+
+  console.log("session: ", session);
   try {
     console.log("txHash: ", txHash);
     
