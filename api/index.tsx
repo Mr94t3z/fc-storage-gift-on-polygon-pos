@@ -641,10 +641,9 @@ app.frame('/gift/:toFid', async (c) => {
 
   try {
     return c.res({
-      action: `/tx-status/${toFid}`,
       image: `/gift-image/${toFid}`,
       intents: [
-        <Button.Transaction target={`/tx-gift/${toFid}`}>Confirm</Button.Transaction>,
+        <Button.Transaction target={`/tx-gift/${toFid}`} action={`/tx-status/${toFid}`}>Confirm</Button.Transaction>,
         <Button action='/'>Cancel</Button>,
       ]
     })
@@ -826,9 +825,13 @@ app.frame("/tx-status/:toFid", async (c) => {
 
   // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
   const txHash = transactionId || buttonValue;
+
+  console.log("buttonValue: ", buttonValue);
   
   if (!txHash) {
-    throw new Error("missing transaction hash");
+    return c.error({
+      message: "Missing transaction hash, please try again.",
+    });
   }
 
   const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
@@ -869,7 +872,7 @@ app.frame("/tx-status/:toFid", async (c) => {
     return c.res({
       image: '/waiting.gif',
       intents: [
-        <Button value={txHash} action={`/tx-status/${toFid}`}>
+        <Button value={transactionId} action={`/tx-status/${toFid}`}>
           Refresh
         </Button>,
       ],
