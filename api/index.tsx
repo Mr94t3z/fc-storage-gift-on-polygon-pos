@@ -906,26 +906,28 @@ app.frame("/tx-status/:transactionId/:toFid", async (c) => {
     });
   }
 
+  const completeTxHash = session.sponsoredTransactionHash;
   const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
-  const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}`;
+  const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}/${completeTxHash}`;
   const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
 
   return c.res({
     image: `/image-share-by-user/${toFid}`,
     intents: [
-      <Button.Link href={session.sponsoredTransactionUrl}>View on Explorer</Button.Link>,
+      <Button.Link href={`https://optimistic.etherscan.io/tx/${completeTxHash}`}>View on Explorer</Button.Link>,
       <Button.Link href={SHARE_BY_USER}>Share</Button.Link>,
     ],
   });
 });
 
 
-app.frame("/share-by-user/:toFid", async (c) => {
-  const { toFid } = c.req.param();
+app.frame("/share-by-user/:toFid/:completeTxHash", async (c) => {
+  const { toFid, completeTxHash } = c.req.param();
  
   return c.res({
     image: `/image-share-by-user/${toFid}`,
     intents: [
+      <Button.Link href={`https://optimistic.etherscan.io/tx/${completeTxHash}`}>View on Explorer</Button.Link>,
       <Button action='/'>Give it a try!</Button>,
     ],
   });
