@@ -558,7 +558,11 @@ app.frame('/search-by-username', async (c) => {
       const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
     
       totalStorageLeft = totalStorageCapacity - totalStorageUsed;
+
+      console.log("totalStorageLeft: ", totalStorageLeft);
     }
+
+    console.log("totalStorageLeft: ", totalStorageLeft);
 
     return c.res({
         image: (
