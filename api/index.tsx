@@ -178,42 +178,9 @@ app.frame('/dashboard', async (c) => {
       ],
     });
   } catch (error) {
-    return c.res({
-      image: (
-        <Box
-            grow
-            alignVertical="center"
-            backgroundColor="black"
-            padding="48"
-            textAlign="center"
-            height="100%"
-        >
-            <VStack gap="4">
-                <Image
-                      height="24"
-                      objectFit="cover"
-                      src="/images/polygon.png"
-                    />
-                <Spacer size="24" />
-                <Heading color="white" weight="900" align="center" size="32">
-                  ⚠️ Failed ⚠️
-                </Heading>
-                <Spacer size="22" />
-                <Text align="center" color="grey" size="16">
-                   Uh oh, something went wrong!
-                </Text>
-                <Spacer size="22" />
-                <Box flexDirection="row" justifyContent="center">
-                    <Text color="white" align="center" size="14">created by</Text>
-                    <Spacer size="10" />
-                    <Text color="grey" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-                </Box>
-            </VStack>
-        </Box>
-      ),
-      intents: [
-        <Button.Reset>Try again</Button.Reset>,
-      ]
+    console.error('Unhandled error:', error);
+    return c.error({
+      message: `${error}`,
     });
   }
 });
@@ -293,8 +260,8 @@ app.frame('/show/:fid', async (c) => {
   }
 
   try {
-    // Fetch relevant following data (because we are using public trial, so we set limit to 15 to avoid rate limit error)
-    const followingResponse = await fetch(`${baseUrlNeynarV2}/following?fid=${fid}&limit=15`, {
+    // Fetch relevant following data (because we are using public trial, so we set limit to 5 to avoid rate limit error)
+    const followingResponse = await fetch(`${baseUrlNeynarV2}/following?fid=${fid}&limit=5`, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
@@ -474,38 +441,8 @@ app.frame('/show/:fid', async (c) => {
     });
   } catch (error) {
     console.error('Unhandled error:', error);
-    return c.res({
-      image: (
-        <Box
-          grow
-          alignVertical="center"
-          backgroundColor="black"
-          padding="48"
-          textAlign="center"
-          height="100%"
-        >
-          <VStack gap="4">
-            <Image height="24" objectFit="cover" src="/images/polygon.png" />
-            <Spacer size="32" />
-            <Heading color="white" weight="600" align="center" size="32">
-              ⚠️ Failed ⚠️
-            </Heading>
-            <Spacer size="22" />
-            <Text align="center" color="grey" size="16">
-              Uh oh, something went wrong!
-            </Text>
-            <Spacer size="32" />
-            <Box flexDirection="row" justifyContent="center">
-              <Text color="white" align="center" size="14">created by</Text>
-              <Spacer size="6" />
-              <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-            </Box>
-          </VStack>
-        </Box>
-      ),
-      intents: [
-        <Button.Reset>Try again</Button.Reset>,
-      ],
+    return c.error({
+      message: `${error}`,
     });
   }
 });
@@ -558,8 +495,6 @@ app.frame('/search-by-username', async (c) => {
       const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
     
       totalStorageLeft = totalStorageCapacity - totalStorageUsed;
-
-      console.log("totalStorageLeft: ", totalStorageLeft);
     }
 
     console.log("totalStorageLeft: ", totalStorageLeft);
@@ -631,38 +566,8 @@ app.frame('/search-by-username', async (c) => {
     });
   } catch (error) {
     console.error('Unhandled error:', error);
-    return c.res({
-      image: (
-        <Box
-          grow
-          alignVertical="center"
-          backgroundColor="black"
-          padding="48"
-          textAlign="center"
-          height="100%"
-        >
-          <VStack gap="4">
-            <Image height="24" objectFit="cover" src="/images/polygon.png" />
-            <Spacer size="32" />
-            <Heading color="white" weight="600" align="center" size="32">
-              ⚠️ Failed ⚠️
-            </Heading>
-            <Spacer size="22" />
-            <Text align="center" color="grey" size="16">
-              Uh oh, something went wrong!
-            </Text>
-            <Spacer size="32" />
-            <Box flexDirection="row" justifyContent="center">
-              <Text color="white" align="center" size="14">created by</Text>
-              <Spacer size="6" />
-              <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-            </Box>
-          </VStack>
-        </Box>
-      ),
-      intents: [
-        <Button.Reset>Try again</Button.Reset>,
-      ],
+    return c.error({
+      message: `${error}`,
     });
   }
 });
@@ -680,43 +585,10 @@ app.frame('/gift/:toFid', async (c) => {
       ]
     })
     } catch (error) {
-      return c.res({
-        image: (
-          <Box
-              grow
-              alignVertical="center"
-              backgroundColor="black"
-              padding="48"
-              textAlign="center"
-              height="100%"
-          >
-              <VStack gap="4">
-                <Image
-                    height="24"
-                    objectFit="cover"
-                    src="/images/polygon.png"
-                  />
-                <Spacer size="32" />
-                <Heading color="white" weight="600" align="center" size="32">
-                  ⚠️ Failed ⚠️
-                </Heading>
-                <Spacer size="22" />
-                <Text align="center" color="grey" size="16">
-                   Uh oh, something went wrong!
-                </Text>
-                <Spacer size="32" />
-                <Box flexDirection="row" justifyContent="center">
-                  <Text color="white" align="center" size="14">created by</Text>
-                  <Spacer size="6" />
-                  <Text color="purple" decoration="underline" align="center" size="14"> @0x94t3z</Text>
-                </Box>
-              </VStack>
-          </Box>
-        ),
-        intents: [
-          <Button.Reset>Try again</Button.Reset>,
-        ]
-    });
+      console.error('Unhandled error:', error);
+      return c.error({
+        message: `${error}`,
+      });
     }
 })
 
