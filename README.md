@@ -60,7 +60,7 @@ The contract are deployed at the following address:
 | StorageRegistry| [0x00000000fcCe7f938e7aE6D3c335bD6a1a7c593D](https://optimistic.etherscan.io/address/0x00000000fcce7f938e7ae6d3c335bd6a1a7c593d) |
 
 ## Demo
-Watch the demo on YouTube: [FC Storage Gift [DEMO]](https://github.com/Mr94t3z/fc-storage-gift-on-polygon-pos)
+Watch the demo on Warpcast: [FC Storage Gift [DEMO]](https://warpcast.com/0x94t3z.eth/0x650600f7)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
