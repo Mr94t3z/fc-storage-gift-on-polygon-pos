@@ -27,6 +27,50 @@ async function cacheData(key: string, data: any) {
     cache[key] = data;
 }
 
+// Cache to store user data
+const cacheUser = new Map();
+
+// Function to fetch data with retries
+async function fetchWithRetry(url: string | URL | Request, options: RequestInit | undefined, retries = 5, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    const response = await fetch(url, options);
+    if (response.ok) {
+      return response.json();
+    }
+    if (response.status === 429 && i < retries - 1) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2;
+    } else {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+  }
+}
+
+// Function to fetch user data by fid
+async function fetchUserData(fid: string) {
+  if (cacheUser.has(fid)) {
+    return cacheUser.get(fid);
+  }
+
+  const url = `${baseUrlNeynarV2}/user/bulk?fids=${fid}`;
+  const options = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
+    },
+  };
+
+  const data = await fetchWithRetry(url, options);
+  if (!data || !data.users || data.users.length === 0) {
+    throw new Error('User not found!');
+  }
+
+  const user = data.users[0];
+  cacheUser.set(fid, user);
+  return user;
+}
+
 
 export const glideClient = createGlideClient({
   projectId: process.env.GLIDE_PROJECT_ID,
@@ -61,7 +105,7 @@ export const app = new Frog({
   },
 }).use(
   neynar({
-    apiKey: process.env.NEYNAR_API_KEY || '',
+    apiKey: process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
     features: ['interactor', 'cast'],
   }),
 )
@@ -178,21 +222,7 @@ app.frame('/dashboard', async (c) => {
 app.image('/dashboard-image/:fid', async (c) => {
   const { fid } = c.req.param();
 
-  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${fid}`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || '',
-    },
-  });
-
-   // Ensure response is OK before parsing
-   if (!response.ok) {
-    throw new Error(`Failed to fetch following data: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const userData = data.users[0];
+  const user = await fetchUserData(fid);
 
   return c.res({
     image: (
@@ -216,7 +246,7 @@ app.image('/dashboard-image/:fid', async (c) => {
               <img
                   height="128"
                   width="128"
-                  src={userData.pfp_url}
+                  src={user.pfp_url}
                   style={{
                     borderRadius: "38%",
                     border: "3.5px solid #6212EC",
@@ -226,10 +256,10 @@ app.image('/dashboard-image/:fid', async (c) => {
               <Spacer size="12" />
                 <Box flexDirection="column" alignHorizontal="left">
                   <Text color="white" align="left" size="14">
-                    Hi, {userData.display_name} 👋
+                    Hi, {user.display_name} 👋
                   </Text>
                   <Text color="grey" align="left" size="12">
-                    @{userData.username}
+                    @{user.username}
                   </Text>
                 </Box>
             </Box>
@@ -268,7 +298,7 @@ app.frame('/show/:fid', async (c) => {
       method: 'GET',
       headers: {
         'accept': 'application/json',
-        'api_key': process.env.NEYNAR_API_KEY || '',
+        'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
       },
     });
 
@@ -304,7 +334,7 @@ app.frame('/show/:fid', async (c) => {
                         method: 'GET',
                         headers: {
                             'accept': 'application/json',
-                            'api_key': process.env.NEYNAR_API_KEY || '',
+                            'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
                         },
                     });
 
@@ -322,10 +352,9 @@ app.frame('/show/:fid', async (c) => {
 
                 if (storageData && storageData.casts && storageData.reactions && storageData.links) {
 
-                    // const totalStorageCapacity = (storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity) * storageData.total_active_units;
-                    const totalStorageCapacity = storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity;
-
-                    const totalStorageUsed = storageData.casts.used + storageData.reactions.used + storageData.links.used;
+                    const totalStorageCapacity = (storageData.casts.limit + storageData.reactions.limit + storageData.links.limit);
+      
+                    const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
 
                     const totalStorageLeft = totalStorageCapacity - totalStorageUsed;
 
@@ -491,7 +520,7 @@ app.frame('/search-by-username', async (c) => {
       method: 'GET',
       headers: {
         'accept': 'application/json',
-        'api_key': process.env.NEYNAR_API_KEY || '',
+        'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
       },
     });
 
@@ -514,7 +543,7 @@ app.frame('/search-by-username', async (c) => {
       method: 'GET',
       headers: {
           'accept': 'application/json',
-          'api_key': process.env.NEYNAR_API_KEY || '',
+          'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
       },
     });
 
@@ -524,11 +553,10 @@ app.frame('/search-by-username', async (c) => {
 
     if (storageData && storageData.casts && storageData.reactions && storageData.links) {
 
-      // const totalStorageCapacity = (storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity) * storageData.total_active_units;
-      const totalStorageCapacity = storageData.casts.capacity + storageData.reactions.capacity + storageData.links.capacity;
-
-      const totalStorageUsed = storageData.casts.used + storageData.reactions.used + storageData.links.used;
-
+      const totalStorageCapacity = (storageData.casts.limit + storageData.reactions.limit + storageData.links.limit);
+    
+      const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
+    
       totalStorageLeft = totalStorageCapacity - totalStorageUsed;
     }
 
@@ -692,21 +720,7 @@ app.frame('/gift/:toFid', async (c) => {
 app.image('/gift-image/:toFid', async (c) => {
   const { toFid } = c.req.param();
 
-  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || '',
-    },
-  });
-
-  // Ensure response is OK before parsing
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const userData = data.users[0];
+  const user = await fetchUserData(toFid);
 
   return c.res({
     image: (
@@ -730,7 +744,7 @@ app.image('/gift-image/:toFid', async (c) => {
               <img
                   height="128"
                   width="128"
-                  src={userData.pfp_url}
+                  src={user.pfp_url}
                   style={{
                     borderRadius: "38%",
                     border: "3.5px solid #6212EC",
@@ -740,10 +754,10 @@ app.image('/gift-image/:toFid', async (c) => {
               <Spacer size="12" />
                 <Box flexDirection="column" alignHorizontal="left">
                   <Text color="white" align="left" size="14">
-                    {userData.display_name}
+                    {user.display_name}
                   </Text>
                   <Text color="grey" align="left" size="12">
-                    @{userData.username}
+                    @{user.username}
                   </Text>
                 </Box>
               </Box>
@@ -751,7 +765,7 @@ app.image('/gift-image/:toFid', async (c) => {
             <Box flexDirection="row" justifyContent="center">
               <Text color="white" align="center" size="16">Do you want to gift</Text>
               <Spacer size="6" />
-              <Text color="purple" align="center" size="16">@{userData.username}</Text>
+              <Text color="purple" align="center" size="16">@{user.username}</Text>
               <Spacer size="6" />
               <Text color="white" align="center" size="16">?</Text>
             </Box>
@@ -849,21 +863,7 @@ app.frame("/tx-status/:transactionId/:toFid", async (c) => {
     });
   }
 
-  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      api_key: process.env.NEYNAR_API_KEY || '',
-    },
-  });
-
-  // Ensure response is OK before parsing
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const userData = data.users[0];
+  const user = await fetchUserData(toFid);
 
   let session;
 
@@ -907,7 +907,7 @@ app.frame("/tx-status/:transactionId/:toFid", async (c) => {
   }
 
   const completeTxHash = session.sponsoredTransactionHash;
-  const shareText = `I just gifted storage to @${userData.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
+  const shareText = `I just gifted storage to @${user.username} on @0xpolygon PoS!\n\nFrame by @0x94t3z.eth`;
   const embedUrlByUser = `${embedUrl}/share-by-user/${toFid}/${completeTxHash}`;
   const SHARE_BY_USER = `${baseUrl}?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(embedUrlByUser)}`;
 
@@ -937,21 +937,7 @@ app.frame("/share-by-user/:toFid/:completeTxHash", async (c) => {
 app.image("/image-share-by-user/:toFid", async (c) => {
   const { toFid } = c.req.param();
 
-  const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${toFid}`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || '',
-    },
-  });
-
-  // Ensure response is OK before parsing
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const userData = data.users[0];
+  const user = await fetchUserData(toFid);
  
   return c.res({
     image: (
@@ -975,7 +961,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
               <img
                   height="128"
                   width="128"
-                  src={userData.pfp_url}
+                  src={user.pfp_url}
                   style={{
                     borderRadius: "38%",
                     border: "3.5px solid #6212EC",
@@ -985,18 +971,18 @@ app.image("/image-share-by-user/:toFid", async (c) => {
               <Spacer size="12" />
                 <Box flexDirection="column" alignHorizontal="left">
                   <Text color="white" align="left" size="14">
-                    {userData.display_name}
+                    {user.display_name}
                   </Text>
                   <Text color="grey" align="left" size="12">
-                    @{userData.username}
+                    @{user.username}
                   </Text>
                 </Box>
               </Box>
             <Spacer size="22" />
             <Box flexDirection="row" justifyContent="center">
-              <Text color="white" align="center" size="16">Storage successfully gifted to</Text>
+              <Text color="white" align="center" size="16">Successfully gifted to</Text>
               <Spacer size="6" />
-              <Text color="purple" align="center" size="16">@{userData.username}</Text>
+              <Text color="purple" align="center" size="16">@{user.username}</Text>
               <Spacer size="6" />
               <Text color="white" align="center" size="16">!</Text>
             </Box>
