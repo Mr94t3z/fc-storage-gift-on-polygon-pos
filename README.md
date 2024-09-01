@@ -39,12 +39,24 @@ A Farcaster Frame is used to locate the people you follow on Farcaster who have 
 ## Technologies Used
 - Node.js
 - Frog
+- Lum0x
 - Neynar
 - Glide
 - Vercel
 
 ## Sign Up for Glide API Key
 Sign up to get your API key for Glide [here](https://paywithglide.xyz/).
+
+## What's Lum0x?
+Lum0x serves as a computation layer for Farcaster, empowering key contributors in the ecosystem, including developers and creators, to generate engaging content such as Frame.
+
+### Additional Materials
+- Lum0x Website - lum0x.com 
+- Lum0x SDK - sdk.lum0x.com 
+- Lum0x Docs - docs.lum0x.com
+
+### Sign Up for Lum0x API Key
+Sign up to get your API key for Lum0x [here](https://buildathon.lum0x.com/).
 
 ## Neynar API Reference
 Explore the Neynar API reference [here](https://docs.neynar.com/reference/neynar-farcaster-api-overview).
