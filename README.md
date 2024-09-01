@@ -24,10 +24,10 @@ A Farcaster Frame is used to locate the people you follow on Farcaster who have 
    ```
 4. Create a `.env` file in the root directory and add the following environment variables:
    ```plaintext
-    GLIDE_PROJECT_ID = "YOUR_GLIDE_PROJECT_ID"
+    LUM0X_API_KEY = "YOUR_LU0X_API_KEY"
     NEYNAR_API_KEY = "YOUR_NEYNAR_API_KEY"
     AIRSTACK_API_KEY = "YOUR_AIRSTACK_API_KEY"
-    LUM0X_API_KEY = "YOUR_LU0X_API_KEY"
+    GLIDE_PROJECT_ID = "YOUR_GLIDE_PROJECT_ID"
    ```
 
 ## Usage
