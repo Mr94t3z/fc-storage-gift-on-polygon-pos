@@ -34,45 +34,43 @@ async function cacheData(key: string, data: any) {
 // Cache to store user data
 const cacheUser = new Map();
 
-// Function to fetch data with retries
-async function fetchWithRetry(url: string | URL | Request, options: RequestInit | undefined, retries = 5, delay = 1000) {
-  for (let i = 0; i < retries; i++) {
-    const response = await fetch(url, options);
-    if (response.ok) {
-      return response.json();
-    }
-    if (response.status === 429 && i < retries - 1) {
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2;
-    } else {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-  }
-}
-
 // Function to fetch user data by fid
 async function fetchUserData(fid: string) {
   if (cacheUser.has(fid)) {
     return cacheUser.get(fid);
   }
 
-  const url = `${baseUrlNeynarV2}/user/bulk?fids=${fid}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-    },
-  };
+  // Fetch user data using Lum0x.farcasterUser.getUserByFids
+  const res = await Lum0x.farcasterUser.getUserByFids({
+    fids: fid,  // Pass the FID directly
+  });
 
-  const data = await fetchWithRetry(url, options);
-  if (!data || !data.users || data.users.length === 0) {
+  // Ensure the response contains the necessary user data
+  if (!res || !res.users || res.users.length === 0) {
     throw new Error('User not found!');
   }
 
-  const user = data.users[0];
+  const user = res.users[0];
   cacheUser.set(fid, user);
   return user;
+}
+
+
+// Lum0x API to validate the frame
+async function postLum0xTestFrameValidation() {
+  const response = await fetch('https://testnetapi.lum0x.com/frame/validation', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      farcasterFid: 397668,
+      frameUrl: `https://pos.0x94t3z.tech/api/frame`
+    })
+  });
+  
+  return await response.json();
 }
 
 
@@ -114,33 +112,18 @@ export const app = new Frog({
   }),
 )
 
-async function postLum0xTestFrameValidation() {
-  fetch('https://testnetapi.lum0x.com/frame/validation', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-          farcasterFid: 397668,
-          frameUrl: `https://pos.0x94t3z.tech/api/frame`
-      })
-    });
-}
-
 // Initialize total pages and current page
 const itemsPerPage = 1;
 let totalPages = 0;
 let currentPage = 1;
 
-// Neynar API base URL
-const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
-
 
 // Initial frame
 app.frame('/', async (c) => {
   const lum0xFrameValidation = await postLum0xTestFrameValidation();
+
   console.log("lum0xFrameValidation: ", lum0xFrameValidation);
+
   return c.res({
     image: (
       <Box
@@ -274,6 +257,10 @@ app.frame('/show/:fid', async (c) => {
 
   const { buttonValue } = c;
 
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
+
   // Handle navigation logic
   if (buttonValue === 'next' && currentPage < totalPages) {
     currentPage++;
@@ -368,7 +355,6 @@ app.frame('/show/:fid', async (c) => {
     const displayName = displayData.length > 0 ? displayData[0].display_name : null;
     const username = displayData.length > 0 ? displayData[0].username : null;
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
-  
 
     return c.res({
         image: (
@@ -448,6 +434,10 @@ app.frame('/show/:fid', async (c) => {
 
 app.frame('/search-by-username', async (c) => {
   const { inputText } = c;
+
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
 
   try {
     // Fetch by username using Lum0x SDK
@@ -562,6 +552,10 @@ app.frame('/search-by-username', async (c) => {
 
 app.frame('/gift/:toFid', async (c) => {
   const { toFid } = c.req.param();
+
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
 
   try {
     return c.res({
@@ -699,6 +693,10 @@ async (c) => {
 app.frame("/refresh-tx-status/:toFid", async (c) => {
   const { transactionId } = c;
   const { toFid } = c.req.param();
+
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
  
   return c.res({
     image: '/waiting.gif',
@@ -714,6 +712,10 @@ app.frame("/refresh-tx-status/:toFid", async (c) => {
 app.frame("/tx-status/:transactionId/:toFid", async (c) => {
   const { buttonValue } = c;
   const { transactionId, toFid } = c.req.param();
+
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
 
   // The payment transaction hash is passed with transactionId if the user just completed the payment. If the user hit the "Refresh" button, the transaction hash is passed with buttonValue.
   const txHash = transactionId || buttonValue;
@@ -786,6 +788,10 @@ app.frame("/tx-status/:transactionId/:toFid", async (c) => {
 
 app.frame("/share-by-user/:toFid/:completeTxHash", async (c) => {
   const { toFid, completeTxHash } = c.req.param();
+
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
  
   return c.res({
     image: `/image-share-by-user/${toFid}`,
