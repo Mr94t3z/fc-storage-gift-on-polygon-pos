@@ -36,8 +36,6 @@ A Farcaster Frame is used to locate the people you follow on Farcaster who have 
    ```
 2. Access the application in your browser at `http://localhost:5173/api/frame/dev`.
 
-Sure, here's a revised version of your README with improved structure and clarity:
-
 ---
 
 ## Technologies Used
@@ -67,6 +65,8 @@ Explore the Neynar API reference here: [Neynar API Documentation](https://docs.n
 
 ### About Frog
 The Storage Farcaster Gift project utilizes Frog, a minimal and lightweight framework specifically designed for Farcaster Frames. Learn more about Frog: [Frog Framework](https://frog.fm/)
+
+---
 
 ## Farcaster: Storage Registry Contract
 The contract are deployed at the following address:
