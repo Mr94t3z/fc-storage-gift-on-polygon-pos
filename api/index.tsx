@@ -5,6 +5,7 @@ import { Box, Image, Heading, Text, VStack, Spacer, vars } from "../lib/ui.js";
 import { storageRegistry } from "../lib/contracts.js";
 import { createGlideClient, Chains, CurrenciesByChain } from "@paywithglide/glide-js";
 import { encodeFunctionData, hexToBigInt, toHex } from 'viem';
+import {Lum0x} from "lum0x-sdk";
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
@@ -13,6 +14,9 @@ import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Initialize Lum0x SDK with API key
+Lum0x.init(process.env.LUM0X_API_KEY || '');
 
 // Define an in-memory cache object
 const cache: Record<string, any> = {};
@@ -110,6 +114,20 @@ export const app = new Frog({
   }),
 )
 
+export async function postLum0xTestFrameValidation(fid: number, path: string) {
+  fetch('https://testnetapi.lum0x.com/frame/validation', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          farcasterFid: fid,
+          frameUrl: `${embedUrl}/${path}`
+      })
+    });
+}
+
 // Initialize total pages and current page
 const itemsPerPage = 1;
 let totalPages = 0;
@@ -120,7 +138,7 @@ const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
 
 
 // Initial frame
-app.frame('/', (c) => {
+app.frame('/', async (c) => {
   return c.res({
     image: (
       <Box
@@ -167,7 +185,7 @@ app.frame('/dashboard', async (c) => {
   const { fid } = c.var.interactor || {}
 
   try {
-
+    await postLum0xTestFrameValidation(Number(fid), 'dashboard')
     return c.res({
       image: `/dashboard-image/${fid}`,
       intents: [
@@ -260,71 +278,50 @@ app.frame('/show/:fid', async (c) => {
   }
 
   try {
-    // Fetch relevant following data (because we are using public trial, so we set limit to 5 to avoid rate limit error)
-    const followingResponse = await fetch(`${baseUrlNeynarV2}/following?fid=${fid}&limit=5`, {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-      },
+    // Fetch following users using Lum0x SDK
+    let followingResponse = await Lum0x.farcasterFollowers.getUsersFollowedByFid({
+      fid: Number(fid),
+      limit: 100
     });
-
-    // Ensure response is OK before parsing
-    if (!followingResponse.ok) {
-      throw new Error(`Failed to fetch following data: ${followingResponse.statusText}`);
+    
+    // Ensure followingResponse.users exists and is an array
+    if (!followingResponse || !Array.isArray(followingResponse.users)) {
+        throw new Error('Invalid following response structure');
     }
-
-    const followingData = await followingResponse.json();
-
+    
     // Batch processing
     const chunkSize = 15;
     const chunkedUsers = [];
-    for (let i = 0; i < followingData.users.length; i += chunkSize) {
-        chunkedUsers.push(followingData.users.slice(i, i + chunkSize));
+    for (let i = 0; i < followingResponse.users.length; i += chunkSize) {
+        chunkedUsers.push(followingResponse.users.slice(i, i + chunkSize));
     }
-
-    // Array to store promises for storage requests
+    
     const storagePromises = [];
-
+    
     // Iterate over each chunk and make separate requests for storage data
     for (const chunk of chunkedUsers) {
-        const chunkPromises = chunk.map(async (userData: { user: { fid: undefined; username: any; pfp_url: any; }; }) => {
-            if (userData && userData.user && userData.user.fid !== undefined && userData.user.username && userData.user.pfp_url) {
+        const chunkPromises = chunk.map(async (userData: { user: { fid: any; username: any; pfp_url: any; }; }) => {
+            if (userData && userData.user && typeof userData.user.fid !== 'undefined' && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
                 const username = userData.user.username;
                 const pfp_url = userData.user.pfp_url;
-
+    
                 // Check if storage data is already cached
-                let storageData = await getFromCache(followingFid);
-                if (!storageData) {
-                    const storageResponse = await fetch(`${baseUrlNeynarV2}/storage/usage?fid=${followingFid}`, {
-                        method: 'GET',
-                        headers: {
-                            'accept': 'application/json',
-                            'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-                        },
+                let storageResponse = await getFromCache(followingFid);
+                if (!storageResponse) {
+                    storageResponse = await Lum0x.farcasterStorage.getStorageUsage({
+                        fid: followingFid
                     });
-
-
-                    // Ensure response is OK before parsing
-                    if (!storageResponse.ok) {
-                      throw new Error(`Failed to fetch storage data: ${storageResponse.statusText}`);
-                    }
-                    
-                    storageData = await storageResponse.json();
-
+    
                     // Cache the storage data
-                    await cacheData(followingFid, storageData);
+                    await cacheData(followingFid, storageResponse);
                 }
-
-                if (storageData && storageData.casts && storageData.reactions && storageData.links) {
-
-                    const totalStorageCapacity = (storageData.casts.limit + storageData.reactions.limit + storageData.links.limit);
-      
-                    const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
-
+    
+                if (storageResponse && storageResponse.casts && storageResponse.reactions && storageResponse.links) {
+                    const totalStorageCapacity = (storageResponse.casts.capacity + storageResponse.reactions.capacity + storageResponse.links.capacity);
+                    const totalStorageUsed = (storageResponse.casts.used + storageResponse.reactions.used + storageResponse.links.used);
                     const totalStorageLeft = totalStorageCapacity - totalStorageUsed;
-
+    
                     return {
                         fid: followingFid,
                         username: username,
@@ -333,44 +330,41 @@ app.frame('/show/:fid', async (c) => {
                     };
                 }
             } else {
-                console.log("User data is missing necessary properties.");
+                console.log("User data is missing necessary properties or user object is undefined.");
                 return null; // Return null for users with missing properties
             }
         });
-
+    
         // Add promises for storage requests in this chunk to the main array
         storagePromises.push(...chunkPromises);
     }
-
+    
     // Wait for all storage requests to complete
     const extractedData = await Promise.all(storagePromises);
-
+    
     // Filter out null values
     const validExtractedData = extractedData.filter(data => data !== null);
-
+    
     // Sort the extracted data in ascending order based on total storage left
     validExtractedData.sort((a, b) => a.totalStorageLeft - b.totalStorageLeft);
-
+    
     // Calculate index range to display data from API
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, validExtractedData.length);
     const displayData = validExtractedData.slice(startIndex, endIndex);
-
+    
     // Update totalPages based on the current extracted data
     totalPages = Math.ceil(validExtractedData.length / itemsPerPage);
     // Limit totalPages to 5
     totalPages = Math.min(totalPages, 5);
-
+    
     // Get the follower chosen to gift storage
     const toFid = displayData.length > 0 ? displayData[0].fid : null;
-
     const pfpUrl = displayData.length > 0 ? displayData[0].pfp_url : null;
-
     const displayName = displayData.length > 0 ? displayData[0].display_name : null;
-
     const username = displayData.length > 0 ? displayData[0].username : null;
-
     const totalStorageLeft = displayData.length > 0 ? displayData[0].totalStorageLeft : null;
+  
 
     return c.res({
         image: (
@@ -452,18 +446,13 @@ app.frame('/search-by-username', async (c) => {
   const { inputText } = c;
 
   try {
-    // Fetch by username
-    const usernameResponse = await fetch(`${baseUrlNeynarV2}/user/search?q=${inputText}`, {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-      },
+    // Fetch by username using Lum0x SDK
+    const usernameResponse = await Lum0x.farcasterUser.searchUser({
+      q: `${inputText}`,
+      limit: 1
     });
 
-    const usernameData = await usernameResponse.json();
-
-    const isUserFound = usernameData?.result?.users?.[0];
+    const isUserFound = usernameResponse?.result?.users?.[0];
 
     if (!isUserFound) {
       return c.error({
@@ -476,23 +465,17 @@ app.frame('/search-by-username', async (c) => {
     const displayName = isUserFound.display_name;
     const username = isUserFound.username;
 
-    const storageResponse = await fetch(`${baseUrlNeynarV2}/storage/usage?fid=${toFid}`, {
-      method: 'GET',
-      headers: {
-          'accept': 'application/json',
-          'api_key': process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-      },
+    const storageResponse = await Lum0x.farcasterStorage.getStorageUsage({
+      fid: toFid
     });
-
-    const storageData = await storageResponse.json();
 
     let totalStorageLeft = 0
 
-    if (storageData && storageData.casts && storageData.reactions && storageData.links) {
+    if (storageResponse && storageResponse.casts && storageResponse.reactions && storageResponse.links) {
 
-      const totalStorageCapacity = (storageData.casts.limit + storageData.reactions.limit + storageData.links.limit);
+      const totalStorageCapacity = (storageResponse.casts.capacity + storageResponse.reactions.capacity + storageResponse.links.capacity);
     
-      const totalStorageUsed = (storageData.casts.used + storageData.reactions.used + storageData.links.used);
+      const totalStorageUsed = (storageResponse.casts.used + storageResponse.reactions.used + storageResponse.links.used);
     
       totalStorageLeft = totalStorageCapacity - totalStorageUsed;
     }

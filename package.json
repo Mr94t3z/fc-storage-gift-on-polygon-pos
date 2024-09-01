@@ -13,6 +13,7 @@
     "dotenv": "^16.4.5",
     "frog": "^0.17.0",
     "hono": "^4",
+    "lum0x-sdk": "^1.0.35",
     "viem": "^2.13.10"
   },
   "devDependencies": {
