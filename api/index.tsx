@@ -114,7 +114,7 @@ export const app = new Frog({
   }),
 )
 
-export async function postLum0xTestFrameValidation(fid: number, path: string) {
+async function postLum0xTestFrameValidation(fid: number, path: string) {
   fetch('https://testnetapi.lum0x.com/frame/validation', {
       method: 'POST',
       headers: {
@@ -185,7 +185,9 @@ app.frame('/dashboard', async (c) => {
   const { fid } = c.var.interactor || {}
 
   try {
-    await postLum0xTestFrameValidation(Number(fid), 'dashboard')
+    const lum0xFrameValidation = await postLum0xTestFrameValidation(Number(fid), 'dashboard')
+
+    console.log("lum0xFrameValidation: ", lum0xFrameValidation);
     return c.res({
       image: `/dashboard-image/${fid}`,
       intents: [
