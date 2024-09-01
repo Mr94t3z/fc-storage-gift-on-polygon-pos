@@ -114,7 +114,7 @@ export const app = new Frog({
   }),
 )
 
-async function postLum0xTestFrameValidation(fid: number, path: string) {
+async function postLum0xTestFrameValidation() {
   fetch('https://testnetapi.lum0x.com/frame/validation', {
       method: 'POST',
       headers: {
@@ -122,8 +122,8 @@ async function postLum0xTestFrameValidation(fid: number, path: string) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-          farcasterFid: fid,
-          frameUrl: `${embedUrl}/${path}`
+          farcasterFid: 397668,
+          frameUrl: `https://pos.0x94t3z.tech/api/frame`
       })
     });
 }
@@ -139,6 +139,8 @@ const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
 
 // Initial frame
 app.frame('/', async (c) => {
+  const lum0xFrameValidation = await postLum0xTestFrameValidation();
+  console.log("lum0xFrameValidation: ", lum0xFrameValidation);
   return c.res({
     image: (
       <Box
@@ -185,7 +187,7 @@ app.frame('/dashboard', async (c) => {
   const { fid } = c.var.interactor || {}
 
   try {
-    const lum0xFrameValidation = await postLum0xTestFrameValidation(Number(fid), 'dashboard')
+    const lum0xFrameValidation = await postLum0xTestFrameValidation();
 
     console.log("lum0xFrameValidation: ", lum0xFrameValidation);
     return c.res({
