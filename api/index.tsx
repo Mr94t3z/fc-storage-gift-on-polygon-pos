@@ -291,12 +291,9 @@ app.frame('/show/:fid', async (c) => {
     
     // Iterate over each chunk and make separate requests for storage data
     for (const chunk of chunkedUsers) {
-        const chunkPromises = chunk.map(async (userData: { user: {
-          [x: string]: any; fid: any; username: any; pfp_url: any; 
-}; }) => {
+        const chunkPromises = chunk.map(async (userData: { user: { fid: any; username: any; pfp_url: any; }; }) => {
             if (userData && userData.user && typeof userData.user.fid !== 'undefined' && userData.user.username && userData.user.pfp_url) {
                 const followingFid = userData.user.fid;
-                const displayName = userData.user.display_name;
                 const username = userData.user.username;
                 const pfp_url = userData.user.pfp_url;
     
@@ -318,7 +315,6 @@ app.frame('/show/:fid', async (c) => {
     
                     return {
                         fid: followingFid,
-                        display_name: displayName,
                         username: username,
                         pfp_url: pfp_url,
                         totalStorageLeft: totalStorageLeft,
