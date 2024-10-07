@@ -1,16 +1,30 @@
-import { Button, Frog, TextInput } from 'frog'
-import { handle } from 'frog/vercel'
-import { neynar } from 'frog/middlewares'
-import { Box, Image, Heading, Text, VStack, Spacer, vars } from "../lib/ui.js";
+import { Button, Frog, TextInput } from 'frog';
+import { handle } from 'frog/vercel';
+import { 
+  Box, 
+  Image, 
+  Heading, 
+  Text, 
+  VStack, 
+  Spacer, 
+  vars 
+} from "../lib/ui.js";
 import { storageRegistry } from "../lib/contracts.js";
-import { createGlideConfig, chains, createSession, currencies, getSessionById, updatePaymentTransaction } from "@paywithglide/glide-js";
+import { 
+  createGlideConfig, 
+  chains, 
+  createSession, 
+  currencies, 
+  getSessionById, 
+  updatePaymentTransaction 
+} from "@paywithglide/glide-js";
 import { hexToBigInt, toHex } from 'viem';
 import { Lum0x } from "lum0x-sdk";
 import dotenv from 'dotenv';
 
 // Uncomment this packages to tested on local server
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -109,12 +123,7 @@ export const app = new Frog<{ State: State }>({
       }
     }
   },
-}).use(
-  neynar({
-    apiKey: process.env.NEYNAR_API_KEY || 'NEYNAR_FROG_FM',
-    features: ['interactor', 'cast'],
-  }),
-)
+})
 
 // Initialize total pages and current page
 const itemsPerPage = 1;
@@ -171,7 +180,8 @@ app.frame('/', async (c) => {
 
 
 app.frame('/dashboard', async (c) => {
-  const { fid } = c.var.interactor || {}
+  const { frameData } = c;
+  const { fid } = frameData as unknown as { buttonIndex?: number; fid?: string };
 
   try {
     const lum0xFrameValidation = await postLum0xTestFrameValidation();
@@ -860,7 +870,7 @@ app.image("/image-share-by-user/:toFid", async (c) => {
 });
 
 // Uncomment for local server testing
-devtools(app, { serveStatic });
+// devtools(app, { serveStatic });
 
 export const GET = handle(app)
 export const POST = handle(app)
